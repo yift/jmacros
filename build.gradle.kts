@@ -9,6 +9,8 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     `java-library`
+
+    id("com.diffplug.gradle.spotless") version "4.0.0"
 }
 
 repositories {
@@ -34,4 +36,10 @@ dependencies {
 val test by tasks.getting(Test::class) {
     // Use junit platform for unit tests
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+    }
 }
