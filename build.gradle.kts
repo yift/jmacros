@@ -20,12 +20,6 @@ repositories {
 }
 
 dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api("org.apache.commons:commons-math3:3.6.1")
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation("com.google.guava:guava:28.2-jre")
-
     // Use JUnit Jupiter API for testing.
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
 
@@ -41,5 +35,16 @@ val test by tasks.getting(Test::class) {
 spotless {
     java {
         googleJavaFormat()
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+    gradle.projectsEvaluated {
+        tasks.withType<JavaCompile>() {
+            options.compilerArgs.plus("-Xlint:all").plus("-Werror")
+        }
     }
 }
