@@ -9,12 +9,12 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.List;
-import com.sun.tools.javac.util.Name;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -57,17 +57,27 @@ public class MacroProcessor extends AbstractProcessor {
   }
 
   private void processUnit(TreeElement<JCCompilationUnit> compilationUnitTree) {
-    boolean hasImportForMacro =
-        compilationUnitTree.element.defs.stream()
-            .filter(tree -> tree instanceof JCTree.JCImport)
-            .map(tree -> (JCTree.JCImport) tree)
-            .map(JCTree.JCImport::getQualifiedIdentifier)
-            .filter(def -> def instanceof JCTree.JCFieldAccess)
-            .map(def -> (JCTree.JCFieldAccess) def)
-            .anyMatch(def -> def.toString().equals(Macro.class.getCanonicalName()));
-    if (hasImportForMacro) {
-      compilationUnitTree.forEachOfType(JCTree.JCVariableDecl.class, this::processVariable);
+    var defSize = compilationUnitTree.element.defs.size();
+    compilationUnitTree.element.defs =
+        removeFromList(
+            compilationUnitTree.element.defs,
+            def -> {
+              if (def instanceof JCTree.JCImport) {
+                if (((JCTree.JCImport) def).getQualifiedIdentifier()
+                    instanceof JCTree.JCFieldAccess) {
+                  return ((JCTree.JCImport) def)
+                      .getQualifiedIdentifier()
+                      .toString()
+                      .equals(Macro.class.getCanonicalName());
+                }
+              }
+              return false;
+            });
+    if (defSize == compilationUnitTree.element.defs.size()) {
+      // Nothing to do, no import for macro.
+      return;
     }
+    compilationUnitTree.forEachOfType(JCTree.JCVariableDecl.class, this::processVariable);
   }
 
   private void processVariable(TreeElement<JCTree.JCVariableDecl> variable) {
@@ -101,8 +111,19 @@ public class MacroProcessor extends AbstractProcessor {
               }
             });
 
-    Name name = (Name) elements.getName("String");
-    tree.vartype = treeMaker.Ident(name);
+    removeVariable(variable);
+  }
+
+  private void removeVariable(TreeElement<JCTree.JCVariableDecl> variable) {
+    var parent = variable.getParent().getElement();
+    var parentKind = parent.getKind();
+    if (parentKind == Tree.Kind.BLOCK) {
+      var block = (JCTree.JCBlock) parent;
+      block.stats = removeFromList(block.stats, statement -> statement == variable.element);
+    } else if (parentKind == Tree.Kind.CLASS) {
+      var classDecl = (JCTree.JCClassDecl) parent;
+      classDecl.defs = removeFromList(classDecl.defs, definition -> definition == variable.element);
+    }
   }
 
   private String getValue(TreeElement<JCTree.JCVariableDecl> variable) {
@@ -209,6 +230,16 @@ public class MacroProcessor extends AbstractProcessor {
   @Override
   public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latestSupported();
+  }
+
+  private <T extends JCTree> List<T> removeFromList(List<T> list, Predicate<T> test) {
+    List<T> newList = List.nil();
+    for (var item : list) {
+      if (!test.test(item)) {
+        newList = newList.append(item);
+      }
+    }
+    return newList;
   }
 
   private TreeElement<JCCompilationUnit> getUnit(Element element) {
