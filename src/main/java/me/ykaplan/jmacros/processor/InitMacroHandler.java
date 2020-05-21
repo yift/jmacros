@@ -14,6 +14,10 @@ abstract class InitMacroHandler extends MacroHandler {
     identifier.error(error);
   }
 
+  protected void warning(String error) {
+    identifier.warning(error);
+  }
+
   abstract boolean validateAndKeepArgument(Object argument);
 
   @Override
