@@ -47,7 +47,7 @@ tasks.register("createMetaInfService") {
         val processors =  File("${projectDir}/src/main/java/me/ykaplan/jmacros/processor")
                 .listFiles()
                 .map {it.name}
-                .filter { it.endsWith(".java") }
+                .filter { it.endsWith("Processor.java") }
                 .map{it.dropLast(5)}
                 .map{"me.ykaplan.jmacros.processor." + it}
                 .joinToString(separator = "\n")

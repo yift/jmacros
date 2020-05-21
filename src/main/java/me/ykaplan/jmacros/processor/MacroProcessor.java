@@ -1,38 +1,26 @@
 package me.ykaplan.jmacros.processor;
 
-import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
-import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.List;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Stack;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.*;
 import javax.tools.Diagnostic;
-import me.ykaplan.jmacros.Macro;
 
 @SupportedAnnotationTypes("*")
 public class MacroProcessor extends AbstractProcessor {
-  private Trees trees;
-  private TreeMaker treeMaker;
-  private Elements elements;
+  private JavacProcessingEnvironment javaProcessingEnvironment;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnvironment) {
     super.init(processingEnvironment);
-    trees = Trees.instance(processingEnvironment);
     if (!(processingEnvironment instanceof JavacProcessingEnvironment)) {
       processingEnvironment
           .getMessager()
@@ -40,10 +28,8 @@ public class MacroProcessor extends AbstractProcessor {
               Diagnostic.Kind.ERROR,
               "Can not cast processingEnvironment to JavacProcessingEnvironment!");
     } else {
-      var context = ((JavacProcessingEnvironment) processingEnvironment).getContext();
-      treeMaker = TreeMaker.instance(context);
+      javaProcessingEnvironment = (JavacProcessingEnvironment) processingEnvironment;
     }
-    elements = processingEnvironment.getElementUtils();
   }
 
   @Override
@@ -57,37 +43,22 @@ public class MacroProcessor extends AbstractProcessor {
   }
 
   private void processUnit(TreeElement<JCCompilationUnit> compilationUnitTree) {
-    var defSize = compilationUnitTree.element.defs.size();
-    compilationUnitTree.element.defs =
-        removeFromList(
-            compilationUnitTree.element.defs,
-            def -> {
-              if (def instanceof JCTree.JCImport) {
-                if (((JCTree.JCImport) def).getQualifiedIdentifier()
-                    instanceof JCTree.JCFieldAccess) {
-                  return ((JCTree.JCImport) def)
-                      .getQualifiedIdentifier()
-                      .toString()
-                      .equals(Macro.class.getCanonicalName());
-                }
-              }
-              return false;
-            });
-    if (defSize == compilationUnitTree.element.defs.size()) {
-      // Nothing to do, no import for macro.
+    var imports = new MacrosImportsHandler(compilationUnitTree);
+    if (!imports.anyMacroSupporter()) {
+      // Nothing to do
       return;
     }
-    compilationUnitTree.forEachOfType(JCTree.JCVariableDecl.class, this::processVariable);
+    compilationUnitTree.getElement().defs = imports.newDefs();
+    var macroHandleFactory = new MacroHandlerFactory(imports);
+    compilationUnitTree.forEachOfType(
+        JCTree.JCVariableDecl.class, variable -> processVariable(variable, macroHandleFactory));
   }
 
-  private void processVariable(TreeElement<JCTree.JCVariableDecl> variable) {
-    var tree = variable.getElement();
-    if ((!(tree.getType() instanceof JCTree.JCIdent))
-        || (!((JCTree.JCIdent) tree.getType())
-            .getName()
-            .toString()
-            .equals(Macro.class.getSimpleName()))) {
-      // Not a macro, no point to continue
+  private void processVariable(
+      TreeElement<JCTree.JCVariableDecl> variable, MacroHandlerFactory macroHandlerFactory) {
+    var handler = macroHandlerFactory.createHandler(variable);
+    if (handler.isEmpty()) {
+      // Nothing to do.
       return;
     }
 
@@ -95,19 +66,14 @@ public class MacroProcessor extends AbstractProcessor {
       return;
     }
 
-    var rawValue = getValue(variable);
-
-    if (rawValue == null) {
-      return;
-    }
-
+    var name = variable.getElement().getName();
     variable
         .getParent()
         .forEachOfType(
             JCTree.JCIdent.class,
             identifier -> {
-              if (identifier.element.name.equals(tree.getName())) {
-                replace(identifier, rawValue);
+              if (identifier.getElement().getName().equals(name)) {
+                replace(identifier, handler.get().getReplacement(identifier));
               }
             });
 
@@ -119,32 +85,11 @@ public class MacroProcessor extends AbstractProcessor {
     var parentKind = parent.getKind();
     if (parentKind == Tree.Kind.BLOCK) {
       var block = (JCTree.JCBlock) parent;
-      block.stats = removeFromList(block.stats, statement -> statement == variable.element);
+      block.stats = List.filter(block.stats, variable.getElement());
     } else if (parentKind == Tree.Kind.CLASS) {
       var classDecl = (JCTree.JCClassDecl) parent;
-      classDecl.defs = removeFromList(classDecl.defs, definition -> definition == variable.element);
+      classDecl.defs = List.filter(classDecl.defs, variable.getElement());
     }
-  }
-
-  private String getValue(TreeElement<JCTree.JCVariableDecl> variable) {
-    var init = variable.getElement().init;
-    var name = variable.getElement().getName();
-    if (init == null) {
-      variable.error("Macro " + name + " must have initialization");
-      return null;
-    } else {
-      if ((init.getKind() != Tree.Kind.STRING_LITERAL) || (!(init instanceof JCTree.JCLiteral))) {
-        variable.error("Macro " + name + " must have string initialization");
-        return null;
-      }
-    }
-
-    var initElement = (JCTree.JCLiteral) init;
-    if (!(initElement.value instanceof String)) {
-      variable.error("Macro " + name + " must have string initialization");
-      return null;
-    }
-    return initElement.value.toString();
   }
 
   private boolean setModifiers(TreeElement<JCTree.JCVariableDecl> variable) {
@@ -180,47 +125,43 @@ public class MacroProcessor extends AbstractProcessor {
     return true;
   }
 
-  private String createReplacementString(TreeElement<JCTree.JCIdent> identifier, String rawValue) {
-    return rawValue
-        .replace("__LINE__", Long.toString(identifier.getLineNumber()))
-        .replace("__METHOD__", identifier.getMethodName())
-        .replace("__FILE__", identifier.getFileName())
-        .replace("__CLASS__", identifier.getClassName());
-  }
-
-  private void replace(TreeElement<JCTree.JCIdent> identifier, String rawValue) {
-    var parent = identifier.parent;
-    var newValue = createReplacementString(identifier, rawValue);
-    var literal = treeMaker.Literal(newValue);
+  private void replace(TreeElement<JCTree.JCIdent> identifier, JCTree.JCExpression replacement) {
+    var parent = identifier.getParent();
     boolean set = false;
-    if (parent.element instanceof JCTree.JCVariableDecl) {
-      var declaration = (JCTree.JCVariableDecl) parent.element;
-      if (declaration.init == identifier.element) {
-        declaration.init = literal;
+    if (parent.getElement() instanceof JCTree.JCVariableDecl) {
+      var declaration = (JCTree.JCVariableDecl) parent.getElement();
+      if (declaration.init == identifier.getElement()) {
+        declaration.init = replacement;
         set = true;
       }
-    } else if (parent.element instanceof JCTree.JCBinary) {
-      var binary = (JCTree.JCBinary) parent.element;
-      if (binary.lhs == identifier.element) {
-        binary.lhs = literal;
+    } else if (parent.getElement() instanceof JCTree.JCBinary) {
+      var binary = (JCTree.JCBinary) parent.getElement();
+      if (binary.lhs == identifier.getElement()) {
+        binary.lhs = replacement;
         set = true;
       }
-      if (binary.rhs == identifier.element) {
-        binary.rhs = literal;
+      if (binary.rhs == identifier.getElement()) {
+        binary.rhs = replacement;
         set = true;
       }
-    } else if (parent.element instanceof JCTree.JCMethodInvocation) {
-      var methodInvocation = (JCTree.JCMethodInvocation) parent.element;
+    } else if (parent.getElement() instanceof JCTree.JCMethodInvocation) {
+      var methodInvocation = (JCTree.JCMethodInvocation) parent.getElement();
       List<JCTree.JCExpression> newArgs = List.nil();
       for (var expression : methodInvocation.args) {
-        if (expression == identifier.element) {
-          newArgs = newArgs.append(literal);
+        if (expression == identifier.getElement()) {
+          newArgs = newArgs.append(replacement);
           set = true;
         } else {
           newArgs = newArgs.append(expression);
         }
       }
       methodInvocation.args = newArgs;
+    } else if (parent.getElement() instanceof JCTree.JCFieldAccess) {
+      var fieldAccess = (JCTree.JCFieldAccess) parent.getElement();
+      if (fieldAccess.selected == identifier.getElement()) {
+        fieldAccess.selected = replacement;
+        set = true;
+      }
     }
     if (!set) {
       identifier.error("Can not use macro");
@@ -232,131 +173,7 @@ public class MacroProcessor extends AbstractProcessor {
     return SourceVersion.latestSupported();
   }
 
-  private <T extends JCTree> List<T> removeFromList(List<T> list, Predicate<T> test) {
-    List<T> newList = List.nil();
-    for (var item : list) {
-      if (!test.test(item)) {
-        newList = newList.append(item);
-      }
-    }
-    return newList;
-  }
-
   private TreeElement<JCCompilationUnit> getUnit(Element element) {
-    try {
-      var tree = trees.getPath(element);
-      if (tree != null) {
-        var compilationUnit = tree.getCompilationUnit();
-        if (compilationUnit instanceof JCCompilationUnit) {
-          return new TreeElement<>((JCCompilationUnit) compilationUnit);
-        }
-      }
-    } catch (Exception e) {
-      // Do nothing.
-    }
-    return null;
-  }
-
-  private class TreeElement<T extends JCTree> {
-    private final T element;
-    private final TreeElement<?> parent;
-
-    private TreeElement(T element) {
-      this(element, null);
-    }
-
-    private TreeElement(T element, TreeElement<?> parent) {
-      this.element = element;
-      this.parent = parent;
-    }
-
-    T getElement() {
-      return element;
-    }
-
-    TreeElement<?> getParent() {
-      return parent;
-    }
-
-    void warning(String text) {
-      message(Diagnostic.Kind.WARNING, text);
-    }
-
-    void error(String text) {
-      message(Diagnostic.Kind.ERROR, text);
-    }
-
-    <R extends JCTree> void forEachOfType(Class<R> type, Consumer<TreeElement<R>> consumer) {
-      var stack = new Stack<TreeElement<?>>();
-      stack.push(this);
-      new TreeScanner<>() {
-        @Override
-        public Object scan(Tree tree, Object o) {
-          if (tree instanceof JCTree) {
-            var item = (JCTree) tree;
-            if (item != stack.peek().element) {
-              var element = new TreeElement<>(item, stack.peek());
-              if (type.isAssignableFrom(tree.getClass())) {
-                @SuppressWarnings("unchecked")
-                var elementInCorrectType = (TreeElement<R>) element;
-                consumer.accept(elementInCorrectType);
-              }
-              stack.push(element);
-              super.scan(tree, o);
-              stack.pop();
-            } else {
-              super.scan(tree, o);
-            }
-          }
-          return null;
-        }
-      }.scan(element, null);
-    }
-
-    CompilationUnitTree getUnit() {
-      if (element instanceof CompilationUnitTree) {
-        return (CompilationUnitTree) element;
-      }
-      if (parent == null) {
-        return null;
-      }
-      return getParent().getUnit();
-    }
-
-    long getLineNumber() {
-      return getUnit().getLineMap().getLineNumber(element.getStartPosition());
-    }
-
-    String getMethodName() {
-      if (element instanceof JCTree.JCMethodDecl) {
-        return ((JCTree.JCMethodDecl) element).getName().toString();
-      }
-      if (parent == null) {
-        return "<>";
-      }
-      return parent.getMethodName();
-    }
-
-    String getFileName() {
-      return getUnit().getSourceFile().getName();
-    }
-
-    private void message(Diagnostic.Kind kind, String text) {
-      trees.printMessage(kind, text, element, getUnit());
-    }
-
-    String getClassName() {
-      if (parent == null) {
-        return "";
-      }
-      var className = parent.getClassName();
-      if (element instanceof JCTree.JCClassDecl) {
-        if (!className.isEmpty()) {
-          className = className + ".";
-        }
-        className = className + ((JCTree.JCClassDecl) element).getSimpleName();
-      }
-      return className;
-    }
+    return TreeElement.getUnit(element, javaProcessingEnvironment);
   }
 }
