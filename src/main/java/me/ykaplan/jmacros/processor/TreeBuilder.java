@@ -1,5 +1,6 @@
 package me.ykaplan.jmacros.processor;
 
+import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -17,7 +18,11 @@ class TreeBuilder {
   }
 
   JCTree.JCLiteral createLiteral(Object value) {
-    return treeMaker.Literal(value);
+    if (value == null) {
+      return treeMaker.Literal(TypeTag.BOT, null);
+    } else {
+      return treeMaker.Literal(value);
+    }
   }
 
   JCTree.JCExpression createIdent(String name) {
@@ -43,5 +48,16 @@ class TreeBuilder {
     var select = createIdent(method);
 
     return treeMaker.Apply(null, select, arguments);
+  }
+
+  JCTree.JCExpression createByteArray(byte[] replacement) {
+    List<JCTree.JCExpression> arguments = List.nil();
+    for (byte b : replacement) {
+      var argument = createLiteral((int) b);
+      arguments = arguments.append(argument);
+    }
+    var identifier = treeMaker.TypeIdent(TypeTag.BYTE);
+
+    return treeMaker.NewArray(identifier, List.nil(), arguments);
   }
 }

@@ -48,6 +48,16 @@ abstract class MacroHandler {
         fieldAccess.selected = replacement;
         set = true;
       }
+    } else if (parent.getElement() instanceof JCTree.JCArrayAccess) {
+      var arrayAccess = (JCTree.JCArrayAccess) parent.getElement();
+      if (arrayAccess.indexed == toReplace.getElement()) {
+        arrayAccess.indexed = replacement;
+        set = true;
+      }
+      if (arrayAccess.index == toReplace.getElement()) {
+        arrayAccess.index = replacement;
+        set = true;
+      }
     }
     if (!set) {
       toReplace.error("Can not use macro");

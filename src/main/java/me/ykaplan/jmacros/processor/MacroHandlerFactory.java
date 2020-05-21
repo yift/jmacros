@@ -30,6 +30,12 @@ class MacroHandlerFactory {
       handler = new BuildTimeMacroHandler(ident);
     } else if (name.equals(BuildEnvironmentVariable.class.getSimpleName())) {
       handler = new BuildEnvironmentVariableHandler(ident);
+    } else if (name.equals(JavaScript.class.getSimpleName())) {
+      handler = new JavaScriptHandler(ident);
+    } else if (name.equals(FileContentAsString.class.getSimpleName())) {
+      handler = new FileContentAsStringHandler(ident);
+    } else if (name.equals(FileContentAsBytes.class.getSimpleName())) {
+      handler = new FileContentAsBytesHandler(ident);
     }
 
     if (handler == null) {
