@@ -2,7 +2,6 @@ package me.ykaplan.jmacros.processor;
 
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.List;
-import java.util.Optional;
 
 abstract class MacroHandler {
   private final TreeElement<? extends JCTree> toReplace;
@@ -55,7 +54,9 @@ abstract class MacroHandler {
     }
   }
 
-  abstract Optional<String> initValueError(JCTree.JCExpression init);
-
   abstract JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier);
+
+  boolean validate() {
+    return true;
+  }
 }

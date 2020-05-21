@@ -2,7 +2,7 @@ package me.ykaplan.jmacros.processor;
 
 import com.sun.tools.javac.tree.JCTree;
 
-abstract class LiteralMacroHandler<T> extends NoInitMacroHandler {
+abstract class LiteralMacroHandler<T> extends MacroHandler {
   LiteralMacroHandler(TreeElement<? extends JCTree> toReplace) {
     super(toReplace);
   }

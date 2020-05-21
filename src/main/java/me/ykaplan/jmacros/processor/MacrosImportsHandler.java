@@ -41,6 +41,6 @@ class MacrosImportsHandler {
   }
 
   boolean isMacroSupported(String macroName) {
-    return supportedMacros.contains(macroName);
+    return supportedMacros.contains(macroName) || supportedMacros.contains("*");
   }
 }

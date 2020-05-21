@@ -28,7 +28,18 @@ class MacroHandlerFactory {
       handler = new ClassNameMacroHandler(ident);
     } else if (name.equals(BuildTime.class.getSimpleName())) {
       handler = new BuildTimeMacroHandler(ident);
+    } else if (name.equals(BuildEnvironmentVariable.class.getSimpleName())) {
+      handler = new BuildEnvironmentVariableHandler(ident);
     }
-    return Optional.ofNullable(handler);
+
+    if (handler == null) {
+      return Optional.empty();
+    }
+
+    if (!handler.validate()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(handler);
   }
 }
