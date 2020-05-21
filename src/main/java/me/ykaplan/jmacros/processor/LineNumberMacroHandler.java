@@ -3,10 +3,13 @@ package me.ykaplan.jmacros.processor;
 import com.sun.tools.javac.tree.JCTree;
 
 class LineNumberMacroHandler extends LiteralMacroHandler<Long> {
-  public LineNumberMacroHandler() {}
+
+  LineNumberMacroHandler(TreeElement<? extends JCTree> toReplace) {
+    super(toReplace);
+  }
 
   @Override
-  Long getLiteralReplacement(TreeElement<JCTree.JCIdent> identifier) {
+  Long getLiteralReplacement(TreeElement<? extends JCTree> identifier) {
     return identifier.getLineNumber();
   }
 }

@@ -6,8 +6,12 @@ import java.time.Instant;
 class BuildTimeMacroHandler extends NoInitMacroHandler {
   private static Instant buildTime = Instant.now();
 
+  BuildTimeMacroHandler(TreeElement<? extends JCTree> toReplace) {
+    super(toReplace);
+  }
+
   @Override
-  JCTree.JCExpression getReplacement(TreeElement<JCTree.JCIdent> identifier) {
+  JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier) {
     return identifier
         .getBuilder()
         .staticMethodInvoke("java.time.Instant.ofEpochMilli", buildTime.toEpochMilli());

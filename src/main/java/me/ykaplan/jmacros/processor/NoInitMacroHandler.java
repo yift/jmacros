@@ -5,6 +5,10 @@ import java.util.Optional;
 
 abstract class NoInitMacroHandler extends MacroHandler {
 
+  NoInitMacroHandler(TreeElement<? extends JCTree> toReplace) {
+    super(toReplace);
+  }
+
   @Override
   Optional<String> initValueError(JCTree.JCExpression init) {
     if (init != null) {

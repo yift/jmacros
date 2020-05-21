@@ -11,36 +11,23 @@ class MacroHandlerFactory {
     this.macrosImportsHandler = macrosImportsHandler;
   }
 
-  public Optional<MacroHandler> createHandler(TreeElement<JCTree.JCVariableDecl> variable) {
-    var tree = variable.getElement();
-    if (!(tree.getType() instanceof JCTree.JCIdent)) {
-      // Not an explicit ident type, no need to continue.
-      return Optional.empty();
-    }
-    var ident = (JCTree.JCIdent) tree.getType();
-    var name = ident.getName().toString();
+  public Optional<MacroHandler> createHandler(TreeElement<JCTree.JCIdent> ident) {
+    var tree = ident.getElement();
+    var name = tree.getName().toString();
     if (!macrosImportsHandler.isMacroSupported(name)) {
       return Optional.empty();
     }
     MacroHandler handler = null;
     if (name.equals(LineNumber.class.getSimpleName())) {
-      handler = new LineNumberMacroHandler();
+      handler = new LineNumberMacroHandler(ident);
     } else if (name.equals(FileName.class.getSimpleName())) {
-      handler = new FileNameMacroHandler(variable);
+      handler = new FileNameMacroHandler(ident);
     } else if (name.equals(MethodName.class.getSimpleName())) {
-      handler = new MethodNameMacroHandler();
+      handler = new MethodNameMacroHandler(ident);
     } else if (name.equals(ClassName.class.getSimpleName())) {
-      handler = new ClassNameMacroHandler();
+      handler = new ClassNameMacroHandler(ident);
     } else if (name.equals(BuildTime.class.getSimpleName())) {
-      handler = new BuildTimeMacroHandler();
-    }
-
-    if (handler != null) {
-      var error = handler.initValueError(tree.init);
-      if (error.isPresent()) {
-        variable.error(error.get());
-        return Optional.empty();
-      }
+      handler = new BuildTimeMacroHandler(ident);
     }
     return Optional.ofNullable(handler);
   }
