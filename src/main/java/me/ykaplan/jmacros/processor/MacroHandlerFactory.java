@@ -38,6 +38,10 @@ class MacroHandlerFactory {
       handler = new FileContentAsBytesHandler(ident);
     } else if (name.equals(ExecuteScript.class.getSimpleName())) {
       handler = new ExecuteScriptHandler(ident);
+    } else if (name.equals(UrlContentAsBytes.class.getSimpleName())) {
+      handler = new UrlContentAsBytesHandler(ident);
+    } else if (name.equals(UrlContentAsString.class.getSimpleName())) {
+      handler = new UrlContentAsStringHandler(ident);
     }
 
     if (handler == null) {
