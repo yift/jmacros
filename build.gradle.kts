@@ -65,6 +65,17 @@ tasks.test {
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
 }
-tasks.build {
+tasks.check {
     dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.8".toBigDecimal()
+            }
+        }
+
+    }
 }
