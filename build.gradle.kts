@@ -11,6 +11,8 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+    testImplementation("com.moandjiezana.toml:toml4j:0.7.2")
+    testImplementation("org.assertj:assertj-core:3.16.1")
 }
 
 val test by tasks.getting(Test::class) {

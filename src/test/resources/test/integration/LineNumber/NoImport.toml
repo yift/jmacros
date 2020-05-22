@@ -1,0 +1,9 @@
+shouldCompile = false
+expectedErrors = [
+    { text = """cannot find symbol
+  symbol:   variable LineNumber
+  location: class NoImport""", line = 6, column = 35},
+    { text = """cannot find symbol
+  symbol:   variable LineNumber
+  location: class NoImport""", line = 12, column = 17}
+]

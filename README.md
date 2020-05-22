@@ -11,3 +11,4 @@ Macros for Java
 * Support for Eclipse?
 * Unit tests
 * CI
+* DynamicClass
