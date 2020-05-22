@@ -1,0 +1,4 @@
+shouldCompile = false
+expectedErrors = [
+    {text= "incompatible types: possible lossy conversion from long to int", line=7, column= 35}
+]

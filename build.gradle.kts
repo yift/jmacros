@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-
+    jacoco
     id("com.diffplug.gradle.spotless") version "4.0.0";
 }
 
@@ -58,4 +58,13 @@ tasks.register("createMetaInfService") {
         mkdir(dir)
         File("${dir}/javax.annotation.processing.Processor").writeText(processors);
     }
+}
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+}
+tasks.build {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }

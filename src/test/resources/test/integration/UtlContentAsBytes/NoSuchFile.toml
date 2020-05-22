@@ -1,0 +1,4 @@
+ shouldCompile = false
+ expectedErrors = [
+    {text= "Can not read file content: no protocol: no such file!", line=7, column= 32}
+ ]

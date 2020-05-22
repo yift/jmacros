@@ -1,0 +1,4 @@
+expectedWarnings = [
+    {text = "warning!", line = 8, column= 32}
+]
+output = "output is: But still, compile"

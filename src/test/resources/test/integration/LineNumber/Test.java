@@ -11,7 +11,7 @@ public class Test {
                 " and now " +
 
 
-                LineNumber;
+                Math.max(0L, LineNumber);
 
     }
 }

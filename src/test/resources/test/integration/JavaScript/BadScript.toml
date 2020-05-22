@@ -1,0 +1,6 @@
+shouldCompile = false
+expectedErrors = [
+    {text = """Can not compile or run JavaScript: <eval>:1:1 Expected } but found eof
+  {
+   ^ in <eval> at line number 1 at column number 1""", line = 8, column= 30}
+]

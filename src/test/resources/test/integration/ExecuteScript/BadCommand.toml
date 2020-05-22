@@ -1,0 +1,4 @@
+shouldCompile = false
+expectedErrors = [
+    {text = """Can not execute 'noScuchCommand' Cannot run program "noScuchCommand": error=2, No such file or directory""", line = 8, column= 33}
+]

@@ -59,6 +59,7 @@ public class IntegrationTests {
       this.tomlFile = tomlFile;
       var dir = tomlFile.getParent();
       testName = tomlFile.getFileName().toString().replace(".toml", "");
+      System.out.println("Testing " + dir.getFileName() + ":" + testName);
       javaSourceFile = dir.resolve(testName + ".java");
       compiler = ToolProvider.getSystemJavaCompiler();
       fileManager = new FileManager(compiler.getStandardFileManager(null, null, null));
@@ -83,15 +84,19 @@ public class IntegrationTests {
       var expectedErrors =
           Optional.ofNullable(config.getTables("expectedErrors")).orElse(List.of());
       softly.assertThat(errors).hasSameSizeAs(expectedErrors);
-      for (int i = 0; i < errors.size(); ++i) {
-        errors.get(i).verify(softly, expectedErrors.get(i));
+      if (errors.size() == expectedErrors.size()) {
+        for (int i = 0; i < errors.size(); ++i) {
+          errors.get(i).verify(softly, expectedErrors.get(i));
+        }
       }
 
       var expectedWarnings =
           Optional.ofNullable(config.getTables("expectedWarnings")).orElse(List.of());
       softly.assertThat(warnings).hasSameSizeAs(expectedWarnings);
-      for (int i = 0; i < warnings.size(); ++i) {
-        warnings.get(i).verify(softly, expectedWarnings.get(i));
+      if (warnings.size() == expectedWarnings.size()) {
+        for (int i = 0; i < warnings.size(); ++i) {
+          warnings.get(i).verify(softly, expectedWarnings.get(i));
+        }
       }
 
       softly.assertAll();
@@ -149,6 +154,11 @@ public class IntegrationTests {
       softly.assertThat(lineNumber).isEqualTo(expected.getLong("line", -1L));
       softly.assertThat(columnNumber).isEqualTo(expected.getLong("column", -1L));
     }
+
+    @Override
+    public String toString() {
+      return "{text= \"" + message + "\", line=" + lineNumber + ", column= " + columnNumber + "}";
+    }
   }
 
   private static class FileObject extends SimpleJavaFileObject {
@@ -161,7 +171,7 @@ public class IntegrationTests {
 
     @Override
     public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-      return Files.readString(file);
+      return Files.readString(file).replace("__HOME__", System.getProperty("user.dir"));
     }
   }
 

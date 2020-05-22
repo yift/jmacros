@@ -1,0 +1,4 @@
+shouldCompile = false
+expectedErrors = [
+    {text= "Can not use macro", line=5, column= 18}
+]
