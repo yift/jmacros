@@ -1,3 +1,3 @@
 package me.ykaplan.jmacros.macros;
 
-public class UrlContentAsBytes {}
+public class UrlContentAsBytes extends Macro {}

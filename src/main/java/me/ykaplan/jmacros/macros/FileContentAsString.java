@@ -1,3 +1,3 @@
 package me.ykaplan.jmacros.macros;
 
-public class FileContentAsString {}
+public class FileContentAsString extends Macro {}

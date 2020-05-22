@@ -1,3 +1,3 @@
 package me.ykaplan.jmacros.macros;
 
-public class JavaScript {}
+public class JavaScript extends Macro {}

@@ -1,3 +1,3 @@
 package me.ykaplan.jmacros.macros;
 
-public class FileContentAsBytes {}
+public class FileContentAsBytes extends Macro {}

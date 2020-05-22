@@ -1,3 +1,3 @@
 package me.ykaplan.jmacros.macros;
 
-public class ExecuteScript {}
+public class ExecuteScript extends Macro {}
