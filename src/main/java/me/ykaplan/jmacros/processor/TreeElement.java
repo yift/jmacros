@@ -16,11 +16,11 @@ class TreeElement<T extends JCTree> {
   private final T element;
   private final TreeElement<?> parent;
   private final Trees trees;
-  private final TreeBuilder builder;
+  private final TreeBuilderFactory builder;
 
   static TreeElement<JCTree.JCCompilationUnit> getUnit(
       Element element, JavacProcessingEnvironment processingEnvironment) {
-    var builder = new TreeBuilder(processingEnvironment);
+    var builder = new TreeBuilderFactory(processingEnvironment);
     var trees = Trees.instance(processingEnvironment);
     try {
       var tree = trees.getPath(element);
@@ -41,7 +41,7 @@ class TreeElement<T extends JCTree> {
     this(element, parent, parent.trees, parent.builder);
   }
 
-  private TreeElement(T element, TreeElement<?> parent, Trees trees, TreeBuilder builder) {
+  private TreeElement(T element, TreeElement<?> parent, Trees trees, TreeBuilderFactory builder) {
     this.element = element;
     this.parent = parent;
     this.trees = trees;
@@ -138,7 +138,7 @@ class TreeElement<T extends JCTree> {
   }
 
   TreeBuilder getBuilder() {
-    return builder;
+    return builder.builder(element);
   }
 
   private static String debugPrint(Object obj) {

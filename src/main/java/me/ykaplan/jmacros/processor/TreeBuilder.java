@@ -1,7 +1,6 @@
 package me.ykaplan.jmacros.processor;
 
 import com.sun.tools.javac.code.TypeTag;
-import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.List;
@@ -11,10 +10,9 @@ class TreeBuilder {
   private final TreeMaker treeMaker;
   private final Names names;
 
-  TreeBuilder(JavacProcessingEnvironment processingEnvironment) {
-    var context = processingEnvironment.getContext();
-    treeMaker = TreeMaker.instance(context);
-    names = Names.instance(context);
+  TreeBuilder(TreeMaker treeMaker, Names names) {
+    this.treeMaker = treeMaker;
+    this.names = names;
   }
 
   JCTree.JCLiteral createLiteral(Object value) {
