@@ -1,0 +1,2 @@
+shouldCompile = false
+expectedErrors = [{text= "Could not find end of interpolation.", line=6, column= 16}]

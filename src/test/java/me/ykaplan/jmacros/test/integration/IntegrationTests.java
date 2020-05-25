@@ -118,7 +118,7 @@ public class IntegrationTests {
 
     private void compile() {
       var output = new StringWriter();
-      var args = List.of("-classpath", System.getProperty("java.class.path"));
+      var args = List.of("-classpath", System.getProperty("java.class.path"), "-Xlint:deprecation");
       var units = List.of(new FileObject(javaSourceFile));
       var task =
           compiler.getTask(

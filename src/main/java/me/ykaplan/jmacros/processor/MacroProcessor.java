@@ -3,6 +3,8 @@ package me.ykaplan.jmacros.processor;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.processing.*;
@@ -14,6 +16,8 @@ import javax.tools.Diagnostic;
 @SupportedAnnotationTypes("*")
 public class MacroProcessor extends AbstractProcessor {
   private JavacProcessingEnvironment javaProcessingEnvironment;
+  private static final Collection<UnitProcessable> processors =
+      List.of(new InterpolationExpander(), new IdentifierReplacer());
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnvironment) {
@@ -39,22 +43,8 @@ public class MacroProcessor extends AbstractProcessor {
     return false;
   }
 
-  private void processUnit(TreeElement<JCCompilationUnit> compilationUnitTree) {
-    var imports = new MacrosImportsHandler(compilationUnitTree);
-    if (!imports.anyMacroSupporter()) {
-      // Nothing to do
-      return;
-    }
-    compilationUnitTree.getElement().defs = imports.newDefs();
-    var macroHandlerFactory = new MacroHandlerFactory(imports);
-    compilationUnitTree.forEachOfType(
-        JCTree.JCIdent.class, ident -> processIdentifier(ident, macroHandlerFactory));
-  }
-
-  private void processIdentifier(
-      TreeElement<JCTree.JCIdent> ident, MacroHandlerFactory macroHandlerFactory) {
-    var handler = macroHandlerFactory.createHandler(ident);
-    handler.ifPresent(h -> h.replace());
+  private void processUnit(TreeElement<JCTree.JCCompilationUnit> compilationUnitTree) {
+    processors.forEach(p -> p.processUnit(compilationUnitTree));
   }
 
   @Override

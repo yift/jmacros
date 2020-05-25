@@ -1,0 +1,5 @@
+shouldCompile = false
+expectedErrors = [{text= "Invalid expression", line=6, column= 16},
+                     {text= "illegal start of expression", line=6, column= 16},
+                     {text= "';' expected", line=6, column= 16},
+                     {text= "reached end of file while parsing", line=6, column= 16}]

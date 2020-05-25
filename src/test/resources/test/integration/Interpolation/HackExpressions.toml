@@ -1,0 +1,5 @@
+shouldCompile = false
+expectedErrors = [{text= "Invalid expression", line=6, column= 17},
+                     {text= "Invalid expression", line=7, column= 17},
+                     {text= "Invalid expression", line=8, column= 17},
+                     {text= "unreachable statement", line=8, column= 17}]

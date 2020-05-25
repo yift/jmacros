@@ -12,3 +12,6 @@ Macros for Java
 * Unit tests
 * CI
 * DynamicClass
+* Docs
+* Wrapper?
+* Class

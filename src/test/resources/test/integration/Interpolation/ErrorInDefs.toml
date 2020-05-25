@@ -1,0 +1,3 @@
+shouldCompile = false
+expectedErrors = [{text= "startsWith can not be empty", line=4, column= 5},
+             {text= "endsWith can not be empty", line=8, column= 5}]
