@@ -4,7 +4,6 @@ Macros for Java
 
 # TODO
 * Extends
-* String interpolation
 * Macro as function
 * Operators
 * Import as
@@ -14,4 +13,3 @@ Macros for Java
 * DynamicClass
 * Docs
 * Wrapper?
-* Class

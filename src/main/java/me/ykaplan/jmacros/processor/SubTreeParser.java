@@ -5,8 +5,6 @@ import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.TreeScanner;
-import com.sun.tools.javac.util.Name;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -47,61 +45,8 @@ class SubTreeParser {
     }
     var retStatement = (JCTree.JCReturn) method.body.stats.get(0);
     var expression = retStatement.getExpression();
-    new TreeScanner() {
-      @Override
-      public void scan(JCTree tree) {
-        if (tree != null) {
-          tree.pos = element.getElement().pos;
-          for (var field : tree.getClass().getFields()) {
-            if (field.getType().isAssignableFrom(Name.class)) {
-              try {
-                var name = field.get(tree);
-                if (name != null) {
-                  var oldName = name.toString();
-                  var newName = element.getBuilder().createName(oldName);
-                  field.set(tree, newName);
-                }
-              } catch (IllegalAccessException e) {
-                element.error("Could not access name: " + e.getMessage());
-              }
-            }
-          }
-        }
+    TreeMover.move(expression, element);
 
-        super.scan(tree);
-      }
-
-      @Override
-      public void visitLiteral(JCTree.JCLiteral tree) {
-        if (tree.value instanceof Name) {
-          var value = tree.value.toString();
-          switch (tree.typetag) {
-            case INT:
-            case CHAR:
-            case BOOLEAN:
-            case BYTE:
-            case SHORT:
-              tree.value = Integer.parseInt(value);
-              break;
-            case CLASS:
-              tree.value = value;
-              break;
-            case LONG:
-              tree.value = Long.parseLong(value);
-              break;
-            case DOUBLE:
-              tree.value = Double.parseDouble(value);
-              break;
-            case FLOAT:
-              tree.value = Float.parseFloat(value);
-              break;
-            default:
-              element.error("Could not set literal " + value + " of type " + tree.typetag);
-          }
-        }
-        super.visitLiteral(tree);
-      }
-    }.scan(expression);
     return expression;
   }
 

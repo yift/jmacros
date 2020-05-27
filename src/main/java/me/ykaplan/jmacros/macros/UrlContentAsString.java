@@ -1,3 +1,3 @@
 package me.ykaplan.jmacros.macros;
 
-public class UrlContentAsString extends Macro {}
+public class UrlContentAsString extends LiteralMacro {}

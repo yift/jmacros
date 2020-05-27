@@ -69,4 +69,8 @@ class TreeBuilder {
   public Name createName(String name) {
     return names.fromString(name);
   }
+
+  public Name createName(Name name) {
+    return createName(name.toString());
+  }
 }

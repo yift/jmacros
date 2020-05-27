@@ -123,6 +123,17 @@ class TreeElement<T extends JCTree> {
     trees.printMessage(kind, text, element, getUnit());
   }
 
+  @SuppressWarnings("unchecked")
+  TreeElement<JCTree.JCClassDecl> getClassType() {
+    if (parent == null) {
+      return null;
+    }
+    if (element instanceof JCTree.JCClassDecl) {
+      return (TreeElement<JCTree.JCClassDecl>) this;
+    }
+    return parent.getClassType();
+  }
+
   String getClassName() {
     if (parent == null) {
       return "";
@@ -164,6 +175,8 @@ class TreeElement<T extends JCTree> {
         builder.append(debugPrint(item));
       }
       return builder.append("]").toString();
+    } else if ((obj instanceof Number) || (obj instanceof Boolean)) {
+      return obj.toString();
     } else if (obj != null) {
       return "\"" + obj.toString() + "\"";
     } else {

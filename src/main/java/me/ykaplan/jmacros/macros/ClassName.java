@@ -1,3 +1,3 @@
 package me.ykaplan.jmacros.macros;
 
-public class ClassName extends Macro {}
+public class ClassName extends LiteralMacro {}

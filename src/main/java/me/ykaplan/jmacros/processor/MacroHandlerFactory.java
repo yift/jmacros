@@ -42,6 +42,8 @@ class MacroHandlerFactory {
       handler = new UrlContentAsBytesHandler(ident);
     } else if (name.equals(UrlContentAsString.class.getSimpleName())) {
       handler = new UrlContentAsStringHandler(ident);
+    } else if (name.equals(ClassType.class.getSimpleName())) {
+      handler = new ClassTypeMacroHandler(ident);
     }
 
     if (handler == null) {

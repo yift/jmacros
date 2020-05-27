@@ -10,7 +10,7 @@ class IdentifierReplacer implements UnitProcessable {
       // Nothing to do
       return;
     }
-    compilationUnitTree.getElement().defs = imports.newDefs();
+
     var macroHandlerFactory = new MacroHandlerFactory(imports);
     compilationUnitTree.forEachOfType(
         JCTree.JCIdent.class, ident -> processIdentifier(ident, macroHandlerFactory));
