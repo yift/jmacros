@@ -1,0 +1,2 @@
+shouldCompile = false
+expectedErrors = [{text= "Invalid regular expression: [--", line=5, column= 1}]

@@ -1,0 +1,2 @@
+shouldCompile = false
+expectedErrors = [{text= "Replacement can not be empty", line=5, column= 1}]

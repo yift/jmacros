@@ -4,7 +4,6 @@ import com.sun.tools.javac.tree.JCTree;
 
 abstract class MacroHandler {
   private final TreeElement<? extends JCTree> toReplace;
-  private static final ExpressionReplacer replacer = new ExpressionReplacer();
 
   protected MacroHandler(TreeElement<? extends JCTree> toReplace) {
     this.toReplace = toReplace;
@@ -12,7 +11,7 @@ abstract class MacroHandler {
 
   void replace() {
     var replacement = getReplacement(toReplace);
-    if (!replacer.replace(toReplace, replacement)) {
+    if (!ExpressionReplacer.replace(toReplace, replacement)) {
       toReplace.error("Can not use macro");
     }
   }

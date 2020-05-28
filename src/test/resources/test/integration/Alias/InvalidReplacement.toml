@@ -1,0 +1,2 @@
+shouldCompile = false
+expectedErrors = [{text= "Replacement: 'java sql Date' must be java identifier", line=5, column= 1}]

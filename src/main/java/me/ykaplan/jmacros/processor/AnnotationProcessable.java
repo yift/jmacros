@@ -2,12 +2,11 @@ package me.ykaplan.jmacros.processor;
 
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-abstract class AnnotationProcessable implements UnitProcessable {
+abstract class AnnotationProcessable<T> implements UnitProcessable {
 
   private final Class<?> annotationClass;
 
@@ -42,31 +41,26 @@ abstract class AnnotationProcessable implements UnitProcessable {
 
     removeMe(annotation);
 
-    var attributes =
-        Optional.ofNullable(annotation.getElement().attribute)
-            .map(
-                atts ->
-                    atts.getElementValues().entrySet().stream()
-                        .filter(Objects::nonNull)
-                        .map(
-                            attribute ->
-                                Map.entry(
-                                    attribute.getKey().getSimpleName().toString(),
-                                    attribute.getValue().getValue()))
-                        .filter(
-                            attribute ->
-                                validateAttribute(
-                                    attribute.getKey(), attribute.getValue(), annotation))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-            .orElse(Map.of());
+    Map<String, T> attributes = new HashMap<>();
+    if (annotation.getElement().attribute != null) {
+      for (var attribute : annotation.getElement().attribute.getElementValues().entrySet()) {
+        var name = attribute.getKey().getSimpleName().toString();
+        var value = attribute.getValue().getValue();
+        var validatedAttribute = validateAttribute(name, value, annotation);
+        if (validatedAttribute.isEmpty()) {
+          return;
+        }
+        attributes.put(name, validatedAttribute.get());
+      }
+    }
     process(annotation.getParent().getParent(), annotation, attributes);
   }
 
-  protected abstract boolean validateAttribute(
+  protected abstract Optional<T> validateAttribute(
       String name, Object value, TreeElement<JCTree.JCAnnotation> annotation);
 
   protected abstract void process(
       TreeElement<? extends JCTree> parent,
       TreeElement<JCTree.JCAnnotation> annotation,
-      Map<String, Object> attributes);
+      Map<String, T> attributes);
 }

@@ -5,7 +5,7 @@ import com.sun.tools.javac.util.List;
 
 class ExpressionReplacer {
 
-  boolean replace(TreeElement<? extends JCTree> toReplace, JCTree.JCExpression replacement) {
+  static boolean replace(TreeElement<? extends JCTree> toReplace, JCTree.JCExpression replacement) {
     var parent = toReplace.getParent().getElement();
     if (parent instanceof JCTree.JCVariableDecl) {
       var declaration = (JCTree.JCVariableDecl) parent;
@@ -69,6 +69,12 @@ class ExpressionReplacer {
       var assign = (JCTree.JCAssign) parent;
       if (assign.getExpression() == toReplace.getElement()) {
         assign.rhs = replacement;
+        return true;
+      }
+    } else if (parent instanceof JCTree.JCNewClass) {
+      var newClass = (JCTree.JCNewClass) parent;
+      if (newClass.clazz == toReplace.getElement()) {
+        newClass.clazz = replacement;
         return true;
       }
     }

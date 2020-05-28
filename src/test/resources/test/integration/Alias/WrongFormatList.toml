@@ -1,0 +1,2 @@
+shouldCompile = false
+expectedErrors = [{text= "Value must have format of: '<regexp> as <name>'", line=5, column= 1}]

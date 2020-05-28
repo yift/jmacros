@@ -3,60 +3,37 @@ package me.ykaplan.jmacros.processor;
 import com.sun.tools.javac.tree.JCTree;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import me.ykaplan.jmacros.Interpolation;
 
-public class InterpolationExpander extends AnnotationProcessable {
-  private static final ExpressionReplacer replacer = new ExpressionReplacer();
+public class InterpolationExpander extends AnnotationProcessable<String> {
 
   protected InterpolationExpander() {
     super(Interpolation.class);
   }
 
-  private void processAnnotation(TreeElement<JCTree.JCAnnotation> annotation) {
-    var attributes =
-        annotation.getElement().attribute.getElementValues().entrySet().stream()
-            .filter(Objects::nonNull)
-            .collect(
-                Collectors.toMap(
-                    attribute -> attribute.getKey().getSimpleName().toString(),
-                    attribute -> {
-                      var value = attribute.getValue().getValue();
-                      if (!(value instanceof String)) {
-                        annotation.error(
-                            attribute.getKey().getSimpleName().toString() + " must be a String");
-                        return (String) null;
-                      }
-                      return attribute.getValue().getValue().toString();
-                    }));
-  }
-
   @Override
-  protected boolean validateAttribute(
+  protected Optional<String> validateAttribute(
       String name, Object value, TreeElement<JCTree.JCAnnotation> annotation) {
     if (!(value instanceof String)) {
       annotation.error(name + " must be a String");
-      return false;
+      return Optional.empty();
     }
-    if (value.toString().isEmpty()) {
+    var str = value.toString();
+    if (str.isEmpty()) {
       annotation.error(name + " can not be empty");
-      return false;
+      return Optional.empty();
     }
-    return true;
+    return Optional.of(str);
   }
 
   @Override
   protected void process(
       TreeElement<? extends JCTree> parent,
       TreeElement<JCTree.JCAnnotation> annotation,
-      Map<String, Object> attributes) {
-    var startsWith = attributes.getOrDefault("startsWith", "`").toString();
-    var endsWith = attributes.getOrDefault("endsWith", startsWith).toString();
-    if (!(startsWith instanceof String) || (startsWith.isEmpty())) {
-      annotation.error("startsWith can not be empty");
-      return;
-    }
+      Map<String, String> attributes) {
+    var startsWith = attributes.getOrDefault("startsWith", "`");
+    var endsWith = attributes.getOrDefault("endsWith", startsWith);
     if ((endsWith == null) || (endsWith.isEmpty())) {
       annotation.error("endsWith can not be empty");
       return;
@@ -103,7 +80,7 @@ public class InterpolationExpander extends AnnotationProcessable {
     for (int i = 2; i < toReplace.size(); ++i) {
       expression = builder.createAdd(expression, toReplace.get(i));
     }
-    if (!replacer.replace(literal, expression)) {
+    if (!ExpressionReplacer.replace(literal, expression)) {
       literal.error("Could not use String interpolation");
     }
   }

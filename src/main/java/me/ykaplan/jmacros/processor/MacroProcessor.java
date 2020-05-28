@@ -17,7 +17,11 @@ import javax.tools.Diagnostic;
 public class MacroProcessor extends AbstractProcessor {
   private JavacProcessingEnvironment javaProcessingEnvironment;
   private static final Collection<UnitProcessable> processors =
-      List.of(new InterpolationExpander(), new IdentifierReplacer(), new DebugPrinter());
+      List.of(
+          new InterpolationExpander(),
+          new IdentifierReplacer(),
+          new DebugPrinter(),
+          new AliasApplier());
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnvironment) {
