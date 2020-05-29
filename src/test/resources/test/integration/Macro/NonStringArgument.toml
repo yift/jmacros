@@ -1,0 +1,5 @@
+shouldCompile = false
+expectedErrors = [
+    {text= "Only support for String arguments", line=10, column= 33},
+    {text= "Only support for String arguments", line=13, column= 33}
+]

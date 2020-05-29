@@ -1,29 +1,40 @@
 package me.ykaplan.jmacros.processor;
 
 import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.util.JavacTask;
-import com.sun.source.util.TaskEvent;
-import com.sun.source.util.TaskListener;
 import com.sun.tools.javac.tree.JCTree;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.tools.*;
 
-class SubTreeParser {
-  private final String code;
+class SubTreeParser extends InternalCompiler {
   private final TreeElement<?> element;
+  private final AtomicReference<JCTree.JCExpression> expression = new AtomicReference<>();
 
   public SubTreeParser(String code, TreeElement<?> element) {
-    this.code = "class Test { public Object go() {return " + code + ";}}";
+    super("class Test { public Object go() {return " + code + ";}}", "Test");
     this.element = element;
   }
 
+  @Override
+  public void gotError(String error) {
+    if (expression.get() == null) {
+      element.error(error);
+    }
+  }
+
+  @Override
+  public void gotWarning(String warning) {
+    if (expression.get() == null) {
+      element.warning(warning);
+    }
+  }
+
+  @Override
+  public void parsed(CompilationUnitTree unit) {
+    expression.set(findExpression(unit));
+  }
+
   JCTree.JCExpression parse() {
-    return compile();
+    compile();
+    return expression.get();
   }
 
   private JCTree.JCExpression findExpression(CompilationUnitTree compiledTree) {
@@ -48,83 +59,5 @@ class SubTreeParser {
     TreeMover.move(expression, element);
 
     return expression;
-  }
-
-  private JCTree.JCExpression compile() {
-    var output = new StringWriter();
-    List<String> args = List.of();
-    var units = List.of(new FileObject());
-    var compiler = ToolProvider.getSystemJavaCompiler();
-    AtomicReference<JCTree.JCExpression> expression = new AtomicReference<>();
-    var task =
-        (JavacTask)
-            compiler.getTask(
-                output,
-                new FileManager(compiler.getStandardFileManager(null, null, null)),
-                diagnostic -> {
-                  if (expression.get() == null) {
-                    if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
-                      element.error(diagnostic.getMessage(null));
-                    } else {
-                      element.warning(diagnostic.getMessage(null));
-                    }
-                  }
-                },
-                args,
-                null,
-                units);
-    task.addTaskListener(
-        new TaskListener() {
-          @Override
-          public void finished(TaskEvent e) {
-            if (e.getKind() == TaskEvent.Kind.PARSE) {
-              var r1 = findExpression(e.getCompilationUnit());
-              expression.set(r1);
-            }
-          }
-        });
-    task.call();
-    return expression.get();
-  }
-
-  private class FileObject extends SimpleJavaFileObject {
-    protected FileObject() {
-      super(URI.create("file:/Test.java"), Kind.SOURCE);
-    }
-
-    @Override
-    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-      return code;
-    }
-  }
-
-  private class FileManager extends ForwardingJavaFileManager<StandardJavaFileManager> {
-    private final Map<String, ClassFile> files = new HashMap<>();
-
-    protected FileManager(StandardJavaFileManager fileManager) {
-      super(fileManager);
-    }
-
-    @Override
-    public JavaFileObject getJavaFileForOutput(
-        Location location,
-        String className,
-        JavaFileObject.Kind kind,
-        javax.tools.FileObject sibling) {
-      return files.computeIfAbsent(className, ClassFile::new);
-    }
-  }
-
-  private class ClassFile extends SimpleJavaFileObject {
-    private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-
-    protected ClassFile(String className) {
-      super(URI.create("string://" + className), Kind.CLASS);
-    }
-
-    @Override
-    public OutputStream openOutputStream() {
-      return bytes;
-    }
   }
 }

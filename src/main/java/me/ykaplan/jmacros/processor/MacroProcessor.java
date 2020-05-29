@@ -18,6 +18,7 @@ public class MacroProcessor extends AbstractProcessor {
   private JavacProcessingEnvironment javaProcessingEnvironment;
   private static final Collection<UnitProcessable> processors =
       List.of(
+          new MacroExtractor(),
           new InterpolationExpander(),
           new IdentifierReplacer(),
           new DebugPrinter(),

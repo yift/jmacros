@@ -9,6 +9,7 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.List;
 import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 
@@ -170,11 +171,8 @@ class TreeElement<T extends JCTree> {
       return builder.append("}").toString();
 
     } else if (obj instanceof List) {
-      var builder = new StringBuilder("[");
-      for (var item : (List) obj) {
-        builder.append(debugPrint(item));
-      }
-      return builder.append("]").toString();
+      return ((List<? extends Object>) obj)
+          .stream().map(TreeElement::debugPrint).collect(Collectors.joining(",", "[", "]"));
     } else if ((obj instanceof Number) || (obj instanceof Boolean)) {
       return obj.toString();
     } else if (obj != null) {

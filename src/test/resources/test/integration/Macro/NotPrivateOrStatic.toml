@@ -1,0 +1,5 @@
+shouldCompile = false
+expectedErrors = [
+    {text= "Macro function must be private and used only within the class", line=10, column = 25},
+    {text= "Macro function must be static and can not have state", line=13, column= 26}
+]

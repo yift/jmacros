@@ -1,0 +1,5 @@
+shouldCompile = true
+output = "{\"-\"=-}"
+expectedWarnings =  [
+    {text= "/Macros.java uses unchecked or unsafe operations.", line=1, column= 1},
+    {text= "Recompile with -Xlint:unchecked for details.", line=1, column= 1}]

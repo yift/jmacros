@@ -1,0 +1,4 @@
+shouldCompile = false
+expectedErrors = [
+    {text = "Macro error: Too many arguments", line = 8, column= 36}
+]

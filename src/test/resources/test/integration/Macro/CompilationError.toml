@@ -1,0 +1,4 @@
+shouldCompile = false
+expectedErrors = [
+    {text = "cannot find symbol\n    symbol:   class NoSuchObject\n    location: class Macros", line = 1, column= 1}
+]

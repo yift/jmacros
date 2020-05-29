@@ -77,6 +77,12 @@ class ExpressionReplacer {
         newClass.clazz = replacement;
         return true;
       }
+    } else if (parent instanceof JCTree.JCParens) {
+      var parens = (JCTree.JCParens) parent;
+      if (parens.expr == toReplace.getElement()) {
+        parens.expr = replacement;
+        return true;
+      }
     }
     return false;
   }
