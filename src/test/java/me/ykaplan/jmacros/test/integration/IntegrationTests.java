@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.tools.*;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -83,6 +84,7 @@ public class IntegrationTests {
 
       var expectedErrors =
           Optional.ofNullable(config.getTables("expectedErrors")).orElse(List.of());
+      expectedErrors = removeUnwantedMessages(expectedErrors);
       softly.assertThat(errors).hasSameSizeAs(expectedErrors);
       if (errors.size() == expectedErrors.size()) {
         for (int i = 0; i < errors.size(); ++i) {
@@ -92,6 +94,7 @@ public class IntegrationTests {
 
       var expectedWarnings =
           Optional.ofNullable(config.getTables("expectedWarnings")).orElse(List.of());
+      expectedWarnings = removeUnwantedMessages(expectedWarnings);
       softly.assertThat(warnings).hasSameSizeAs(expectedWarnings);
       if (warnings.size() == expectedWarnings.size()) {
         for (int i = 0; i < warnings.size(); ++i) {
@@ -100,6 +103,13 @@ public class IntegrationTests {
       }
 
       softly.assertAll();
+    }
+
+    private List<Toml> removeUnwantedMessages(List<Toml> messages) {
+      var javaVersion = System.getProperty("java.version").split("\\.")[0];
+      return messages.stream()
+          .filter(m -> m.getString("onlyFor", javaVersion).equals(javaVersion))
+          .collect(Collectors.toList());
     }
 
     private void execute() throws Exception {
