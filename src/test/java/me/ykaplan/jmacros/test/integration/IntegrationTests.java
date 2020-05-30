@@ -150,7 +150,10 @@ public class IntegrationTests {
     }
 
     public void verify(SoftAssertions softly, Toml expected) {
-      softly.assertThat(message).isEqualTo(expected.getString("text", ""));
+      softly
+          .assertThat(message)
+          .isEqualTo(
+              expected.getString("text", "").replace("$PWD", System.getProperty("user.dir")));
       softly.assertThat(lineNumber).isEqualTo(expected.getLong("line", -1L));
       softly.assertThat(columnNumber).isEqualTo(expected.getLong("column", -1L));
     }
