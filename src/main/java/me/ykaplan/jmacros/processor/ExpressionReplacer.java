@@ -5,23 +5,23 @@ import com.sun.tools.javac.util.List;
 
 class ExpressionReplacer {
 
-  static boolean replace(TreeElement<? extends JCTree> toReplace, JCTree.JCExpression replacement) {
+  static void replace(TreeElement<? extends JCTree> toReplace, JCTree.JCExpression replacement) {
     var parent = toReplace.getParent().getElement();
     if (parent instanceof JCTree.JCVariableDecl) {
       var declaration = (JCTree.JCVariableDecl) parent;
       if (declaration.init == toReplace.getElement()) {
         declaration.init = replacement;
-        return true;
+        return;
       }
     } else if (parent instanceof JCTree.JCBinary) {
       var binary = (JCTree.JCBinary) parent;
       if (binary.lhs == toReplace.getElement()) {
         binary.lhs = replacement;
-        return true;
+        return;
       }
       if (binary.rhs == toReplace.getElement()) {
         binary.rhs = replacement;
-        return true;
+        return;
       }
     } else if (parent instanceof JCTree.JCMethodInvocation) {
       var methodInvocation = (JCTree.JCMethodInvocation) parent;
@@ -35,55 +35,58 @@ class ExpressionReplacer {
           newArgs = newArgs.append(expression);
         }
       }
-      methodInvocation.args = newArgs;
-      return set;
+      if (set) {
+        methodInvocation.args = newArgs;
+        return;
+      }
     } else if (parent instanceof JCTree.JCFieldAccess) {
       var fieldAccess = (JCTree.JCFieldAccess) parent;
       if (fieldAccess.selected == toReplace.getElement()) {
         fieldAccess.selected = replacement;
-        return true;
+        return;
       }
     } else if (parent instanceof JCTree.JCArrayAccess) {
       var arrayAccess = (JCTree.JCArrayAccess) parent;
       if (arrayAccess.indexed == toReplace.getElement()) {
         arrayAccess.indexed = replacement;
-        return true;
+        return;
       }
       if (arrayAccess.index == toReplace.getElement()) {
         arrayAccess.index = replacement;
-        return true;
+        return;
       }
     } else if (parent instanceof JCTree.JCReturn) {
       var ret = (JCTree.JCReturn) parent;
       if (ret.expr == toReplace.getElement()) {
         ret.expr = replacement;
-        return true;
+        return;
       }
     } else if (parent instanceof JCTree.JCTypeCast) {
       var cast = (JCTree.JCTypeCast) parent;
       if (cast.getExpression() == toReplace.getElement()) {
         cast.expr = replacement;
-        return true;
+        return;
       }
     } else if (parent instanceof JCTree.JCAssign) {
       var assign = (JCTree.JCAssign) parent;
       if (assign.getExpression() == toReplace.getElement()) {
         assign.rhs = replacement;
-        return true;
+        return;
       }
     } else if (parent instanceof JCTree.JCNewClass) {
       var newClass = (JCTree.JCNewClass) parent;
       if (newClass.clazz == toReplace.getElement()) {
         newClass.clazz = replacement;
-        return true;
+        return;
       }
     } else if (parent instanceof JCTree.JCParens) {
       var parens = (JCTree.JCParens) parent;
       if (parens.expr == toReplace.getElement()) {
         parens.expr = replacement;
-        return true;
+        return;
       }
     }
-    return false;
+    toReplace.error(
+        "Replacing this kind of element in not yet supported; please report an issue in https://github.com/yift/jmacros");
   }
 }

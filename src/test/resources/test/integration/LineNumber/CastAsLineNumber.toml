@@ -1,4 +1,4 @@
 shouldCompile = false
 expectedErrors = [
-    {text= "Can not use macro", line=5, column= 18}
+    {text= "Replacing this kind of element in not yet supported; please report an issue in https://github.com/yift/jmacros", line=5, column= 18}
 ]

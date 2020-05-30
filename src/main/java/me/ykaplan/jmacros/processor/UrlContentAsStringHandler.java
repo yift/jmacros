@@ -3,7 +3,7 @@ package me.ykaplan.jmacros.processor;
 import com.sun.tools.javac.tree.JCTree;
 import java.net.URL;
 
-public class UrlContentAsStringHandler extends InitMacroHandler {
+class UrlContentAsStringHandler extends InitMacroHandler {
   private String replacement = null;
 
   protected UrlContentAsStringHandler(TreeElement<JCTree.JCIdent> identifier) {

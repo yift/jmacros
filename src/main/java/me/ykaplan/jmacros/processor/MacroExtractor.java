@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import me.ykaplan.jmacros.Macro;
 import me.ykaplan.jmacros.macros.LiteralMacro;
 
-public class MacroExtractor implements UnitProcessable {
+class MacroExtractor implements UnitProcessable {
   @Override
   public void processUnit(TreeElement<JCTree.JCCompilationUnit> compilationUnitTree) {
     var unit = new Unit(compilationUnitTree);
@@ -143,7 +143,7 @@ public class MacroExtractor implements UnitProcessable {
 
   private class Unit {
     private final Map<String, Method> methods = new HashMap<>();
-    private final Optional<Compiler.Invoker> invoker;
+    private final Optional<Invoker> invoker;
     private final TreeElement<JCTree.JCCompilationUnit> compilationUnitTree;
 
     Unit(TreeElement<JCTree.JCCompilationUnit> compilationUnitTree) {
@@ -247,9 +247,7 @@ public class MacroExtractor implements UnitProcessable {
           var compiler = new SubTreeParser(replacement.toString(), methodInvocation);
           newExpression = compiler.parse();
         }
-        if (!ExpressionReplacer.replace(methodInvocation, newExpression)) {
-          methodInvocation.error("Can not extract macro: " + method.name);
-        }
+        ExpressionReplacer.replace(methodInvocation, newExpression);
       } catch (Exception e) {
         var message = e.getMessage();
         if ((message == null) && (e.getCause() != null)) {

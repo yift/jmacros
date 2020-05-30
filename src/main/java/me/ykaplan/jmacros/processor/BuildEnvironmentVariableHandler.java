@@ -2,7 +2,7 @@ package me.ykaplan.jmacros.processor;
 
 import com.sun.tools.javac.tree.JCTree;
 
-public class BuildEnvironmentVariableHandler extends InitMacroHandler {
+class BuildEnvironmentVariableHandler extends InitMacroHandler {
   private String replacement = null;
 
   protected BuildEnvironmentVariableHandler(TreeElement<JCTree.JCIdent> identifier) {

@@ -3,11 +3,17 @@ package me.ykaplan.jmacros.processor;
 import com.sun.tools.javac.tree.JCTree;
 import java.util.concurrent.TimeUnit;
 
-public class ExecuteScriptHandler extends InitMacroHandler {
+class ExecuteScriptHandler extends InitMacroHandler {
   private String replacement = null;
+  private final Runtime runtime;
+
+  ExecuteScriptHandler(TreeElement<JCTree.JCIdent> identifier, Runtime runtime) {
+    super(identifier);
+    this.runtime = runtime;
+  }
 
   protected ExecuteScriptHandler(TreeElement<JCTree.JCIdent> identifier) {
-    super(identifier);
+    this(identifier, Runtime.getRuntime());
   }
 
   @Override
@@ -32,7 +38,7 @@ public class ExecuteScriptHandler extends InitMacroHandler {
   }
 
   private String execute(String command) throws Exception {
-    var process = Runtime.getRuntime().exec(command);
+    var process = runtime.exec(command);
     if (!process.waitFor(30, TimeUnit.SECONDS)) {
       throw new Exception("Timeout!");
     }

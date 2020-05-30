@@ -11,9 +11,7 @@ abstract class MacroHandler {
 
   void replace() {
     var replacement = getReplacement(toReplace);
-    if (!ExpressionReplacer.replace(toReplace, replacement)) {
-      toReplace.error("Can not use macro");
-    }
+    ExpressionReplacer.replace(toReplace, replacement);
   }
 
   abstract JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier);

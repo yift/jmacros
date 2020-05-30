@@ -2,19 +2,19 @@
 Macros for Java
 
 
-# TODO
-* Extends
-* Macro as function
-* Operators
-* Import as
+# TODO - Phase 1
+* Unit tests
+* Java 11
+* Java 14
 * Support for Eclipse
 * Support for Idea
 * Windows
 * OSX
-* Java 11
-* Java 14
-* Unit tests
 * CI
-* DynamicClass
 * Docs
+
+# Future Phase 2
+* Extends
+* Operators
+* DynamicClass
 * Wrapper?

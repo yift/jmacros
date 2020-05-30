@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import me.ykaplan.jmacros.Interpolation;
 
-public class InterpolationExpander extends AnnotationProcessable<String> {
+class InterpolationExpander extends AnnotationProcessable<String> {
 
   protected InterpolationExpander() {
     super(Interpolation.class);
@@ -34,10 +34,6 @@ public class InterpolationExpander extends AnnotationProcessable<String> {
       Map<String, String> attributes) {
     var startsWith = attributes.getOrDefault("startsWith", "`");
     var endsWith = attributes.getOrDefault("endsWith", startsWith);
-    if ((endsWith == null) || (endsWith.isEmpty())) {
-      annotation.error("endsWith can not be empty");
-      return;
-    }
     parent.forEachOfType(
         JCTree.JCLiteral.class, literal -> processLiteral(literal, startsWith, endsWith));
   }
@@ -80,8 +76,6 @@ public class InterpolationExpander extends AnnotationProcessable<String> {
     for (int i = 2; i < toReplace.size(); ++i) {
       expression = builder.createAdd(expression, toReplace.get(i));
     }
-    if (!ExpressionReplacer.replace(literal, expression)) {
-      literal.error("Could not use String interpolation");
-    }
+    ExpressionReplacer.replace(literal, expression);
   }
 }

@@ -107,9 +107,7 @@ class AliasApplier extends AnnotationProcessable<Function<String, String>> {
           var newName = value.apply(oldName);
           if (!oldName.equals(newName)) {
             var toReplace = builder.createIdent(newName);
-            if (!ExpressionReplacer.replace(ident, toReplace)) {
-              ident.error("Could not use Alias");
-            }
+            ExpressionReplacer.replace(ident, toReplace);
           }
         });
   }

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class FileContentAsStringHandler extends InitMacroHandler {
+class FileContentAsStringHandler extends InitMacroHandler {
   private String replacement = null;
 
   protected FileContentAsStringHandler(TreeElement<JCTree.JCIdent> identifier) {

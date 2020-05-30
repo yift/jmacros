@@ -3,7 +3,7 @@ package me.ykaplan.jmacros.processor;
 import com.sun.tools.javac.tree.JCTree;
 import java.net.URL;
 
-public class UrlContentAsBytesHandler extends InitMacroHandler {
+class UrlContentAsBytesHandler extends InitMacroHandler {
   private byte[] replacement = null;
 
   protected UrlContentAsBytesHandler(TreeElement<JCTree.JCIdent> identifier) {

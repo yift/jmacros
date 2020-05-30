@@ -4,7 +4,7 @@ import com.sun.tools.javac.tree.JCTree;
 import javax.script.*;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
-public class JavaScriptHandler extends InitMacroHandler {
+class JavaScriptHandler extends InitMacroHandler {
   private Object replacement = null;
 
   protected JavaScriptHandler(TreeElement<JCTree.JCIdent> identifier) {

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class FileContentAsBytesHandler extends InitMacroHandler {
+class FileContentAsBytesHandler extends InitMacroHandler {
   private byte[] replacement = null;
 
   protected FileContentAsBytesHandler(TreeElement<JCTree.JCIdent> identifier) {
