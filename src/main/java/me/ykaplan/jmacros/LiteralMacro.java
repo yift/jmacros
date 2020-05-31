@@ -33,7 +33,8 @@ public class LiteralMacro {
   }
 
   public static String className() {
-    return classType().getSimpleName();
+    var classFullName = new Exception().getStackTrace()[1].getClassName().split("\\.");
+    return classFullName[classFullName.length - 1];
   }
 
   public static String executeScript(String command) {
@@ -109,7 +110,7 @@ public class LiteralMacro {
     return new Exception().getStackTrace()[1].getMethodName();
   }
 
-  public static byte[] urlContentAsByte(String urlAsString) {
+  public static byte[] urlContentAsBytes(String urlAsString) {
     try {
       var url = new URL(urlAsString);
       try (var reader = url.openStream(); ) {
@@ -121,6 +122,6 @@ public class LiteralMacro {
   }
 
   public static String urlContentAsString(String urlAsString) {
-    return new String(urlContentAsByte(urlAsString));
+    return new String(urlContentAsBytes(urlAsString));
   }
 }

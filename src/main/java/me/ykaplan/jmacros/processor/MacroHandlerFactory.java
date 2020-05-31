@@ -55,9 +55,6 @@ class MacroHandlerFactory {
         .flatMap(
             methodName -> {
               var methodPath = methodName.split("\\.");
-              if (methodPath.length == 0) {
-                return Optional.empty();
-              }
               if (methodPath.length == 1) {
                 if (!invocation.getImports().isLiteralFunctionSupported(methodPath[0])) {
                   return Optional.empty();
