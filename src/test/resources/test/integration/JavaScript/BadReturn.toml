@@ -1,4 +1,4 @@
 shouldCompile = false
 expectedErrors = [
-    {text = "Can not compile or run JavaScript: Can not change {} to literal", line = 8, column= 30}
+    {text = "Can not compile or run JavaScript: Can not change {} to literal", line = 8, column= 40}
 ]

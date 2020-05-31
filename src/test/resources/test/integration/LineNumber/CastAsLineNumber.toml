@@ -1,4 +1,0 @@
-shouldCompile = false
-expectedErrors = [
-    {text= "Replacing this kind of element in not yet supported; please report an issue in https://github.com/yift/jmacros", line=5, column= 18}
-]

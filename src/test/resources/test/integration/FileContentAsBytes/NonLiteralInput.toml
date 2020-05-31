@@ -1,4 +1,4 @@
 shouldCompile = false
 expectedErrors = [
-    {text = "Need literal argument for FileContentAsBytes.", line = 8, column= 21}
+    {text = "Need literal argument.", line = 8, column= 39}
 ]

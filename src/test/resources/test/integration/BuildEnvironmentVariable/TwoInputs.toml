@@ -1,4 +1,4 @@
 shouldCompile = false
 expectedErrors = [
-    {text = "Need one argument for BuildEnvironmentVariable.", line = 8, column= 33}
+    {text = "Need an argument.", line = 8, column= 57}
 ]

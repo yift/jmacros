@@ -1,4 +1,0 @@
-shouldCompile = false
-expectedErrors = [
-    {text = "One can only use BuildEnvironmentVariable as a function.", line = 8, column= 33}
-]

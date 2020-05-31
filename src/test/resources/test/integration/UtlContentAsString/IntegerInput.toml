@@ -1,4 +1,0 @@
-shouldCompile = false
-expectedErrors = [
-    {text = "Argument must be String", line = 8, column= 32}
-]

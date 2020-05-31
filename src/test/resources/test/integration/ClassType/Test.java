@@ -1,22 +1,22 @@
-import me.ykaplan.jmacros.macros.*;
+import static me.ykaplan.jmacros.LiteralMacro.*;
 
 public class Test {
 
 
     public static String go() {
-        return "Class name is " + ClassType.getCanonicalName() + " -- " + AnotherClass.getName();
+        return "Class name is " + classType().getCanonicalName() + " -- " + AnotherClass.getName();
     }
 }
 
 class AnotherClass {
-    private final static Class<?> CLASS = ClassType;
+    private final static Class<?> CLASS = classType();
     public static String getName() {
-        return ClassType.getSimpleName() + "  " + CLASS +" " + new innerClass().myName();
+        return classType().getSimpleName() + "  " + CLASS +" " + new innerClass().myName();
     }
 
     private static class innerClass {
         public String myName() {
-            return ClassType.getCanonicalName();
+            return classType().getCanonicalName();
         }
     }
 

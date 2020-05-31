@@ -1,11 +1,11 @@
-import me.ykaplan.jmacros.macros.*;
+import me.ykaplan.jmacros.LiteralMacro.*;
 
 public class IntegerInput {
 
 
     public static String go() {
 
-        return "content is " + FileContentAsString(100);
+        return "content is " + fileContentAsString(100);
 
     }
 }

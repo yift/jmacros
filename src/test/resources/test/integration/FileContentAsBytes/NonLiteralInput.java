@@ -1,11 +1,11 @@
-import me.ykaplan.jmacros.macros.*;
+import static me.ykaplan.jmacros.LiteralMacro.fileContentAsBytes;
 
 public class NonLiteralInput {
 
 
     public static String go() {
 
-        return "" + FileContentAsBytes(System.getenv("hi"));
+        return "" + fileContentAsBytes(System.getenv("hi"));
 
     }
 }

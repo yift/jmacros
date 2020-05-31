@@ -1,59 +1,102 @@
 package me.ykaplan.jmacros.processor;
 
 import com.sun.tools.javac.tree.JCTree;
+import java.util.Objects;
 import java.util.Optional;
-import me.ykaplan.jmacros.macros.*;
+import java.util.Set;
+import me.ykaplan.jmacros.LiteralMacro;
 
 class MacroHandlerFactory {
-  private final MacrosImportsHandler macrosImportsHandler;
+  private static final Set<Class<? extends MacroHandler>> handlers =
+      Set.of(
+          LineNumberHandler.class,
+          FileNameHandler.class,
+          MethodNameHandler.class,
+          ClassNameHandler.class,
+          BuildTimeHandler.class,
+          BuildEnvironmentVariableHandler.class,
+          JavaScriptHandler.class,
+          FileContentAsStringHandler.class,
+          FileContentAsBytesHandler.class,
+          ExecuteScriptHandler.class,
+          UrlContentAsBytesHandler.class,
+          UrlContentAsStringHandler.class,
+          ClassTypeHandler.class);
 
-  public MacroHandlerFactory(MacrosImportsHandler macrosImportsHandler) {
-    this.macrosImportsHandler = macrosImportsHandler;
+  public static Optional<? extends MacroHandler> createHandler(
+      TreeElement<JCTree.JCMethodInvocation> invocation) {
+    var methodName = extractMethodName(invocation);
+    if (methodName.isEmpty()) {
+      return Optional.empty();
+    }
+    var name = methodName.get();
+    return handlers.stream()
+        .filter(cls -> classHandlerCanHandleFunction(cls, name))
+        .map(
+            cls -> {
+              try {
+                var constructor = cls.getDeclaredConstructor(TreeElement.class);
+                return constructor.newInstance(invocation);
+              } catch (Exception e) {
+                invocation.error("Could not create handler for " + name + " - " + e.getMessage());
+                return null;
+              }
+            })
+        .filter(Objects::nonNull)
+        .filter(MacroHandler::validate)
+        .findAny();
   }
 
-  public Optional<MacroHandler> createHandler(TreeElement<JCTree.JCIdent> ident) {
-    var tree = ident.getElement();
-    var name = tree.getName().toString();
-    if (!macrosImportsHandler.isMacroSupported(name)) {
+  private static Optional<String> extractMethodName(
+      TreeElement<JCTree.JCMethodInvocation> invocation) {
+    var methodInvocation = invocation.getElement();
+    var method = methodInvocation.meth;
+    return getMethodName(method)
+        .flatMap(
+            methodName -> {
+              var methodPath = methodName.split("\\.");
+              if (methodPath.length == 0) {
+                return Optional.empty();
+              }
+              if (methodPath.length == 1) {
+                if (!invocation.getImports().isLiteralFunctionSupported(methodPath[0])) {
+                  return Optional.empty();
+                }
+                return Optional.of(methodName);
+              }
+              if (methodPath.length == 2) {
+                if ((methodPath[0].equals(LiteralMacro.class.getSimpleName()))
+                    && (invocation.getImports().isMacroSupported(LiteralMacro.class))) {
+                  return Optional.of(methodPath[1]);
+                } else {
+                  return Optional.empty();
+                }
+              }
+              if (methodName.startsWith(LiteralMacro.class.getCanonicalName())) {
+                return Optional.of(methodPath[methodPath.length - 1]);
+              }
+
+              return Optional.empty();
+            });
+  }
+
+  private static Optional<String> getMethodName(JCTree.JCExpression expression) {
+    if (expression instanceof JCTree.JCFieldAccess) {
+      var access = (JCTree.JCFieldAccess) expression;
+      return getMethodName(access.selected).map(s -> s + "." + access.name.toString());
+    } else if (expression instanceof JCTree.JCIdent) {
+      return Optional.of(((JCTree.JCIdent) expression).name.toString());
+    } else {
       return Optional.empty();
     }
-    MacroHandler handler = null;
-    if (name.equals(LineNumber.class.getSimpleName())) {
-      handler = new LineNumberMacroHandler(ident);
-    } else if (name.equals(FileName.class.getSimpleName())) {
-      handler = new FileNameMacroHandler(ident);
-    } else if (name.equals(MethodName.class.getSimpleName())) {
-      handler = new MethodNameMacroHandler(ident);
-    } else if (name.equals(ClassName.class.getSimpleName())) {
-      handler = new ClassNameMacroHandler(ident);
-    } else if (name.equals(BuildTime.class.getSimpleName())) {
-      handler = new BuildTimeMacroHandler(ident);
-    } else if (name.equals(BuildEnvironmentVariable.class.getSimpleName())) {
-      handler = new BuildEnvironmentVariableHandler(ident);
-    } else if (name.equals(JavaScript.class.getSimpleName())) {
-      handler = new JavaScriptHandler(ident);
-    } else if (name.equals(FileContentAsString.class.getSimpleName())) {
-      handler = new FileContentAsStringHandler(ident);
-    } else if (name.equals(FileContentAsBytes.class.getSimpleName())) {
-      handler = new FileContentAsBytesHandler(ident);
-    } else if (name.equals(ExecuteScript.class.getSimpleName())) {
-      handler = new ExecuteScriptHandler(ident);
-    } else if (name.equals(UrlContentAsBytes.class.getSimpleName())) {
-      handler = new UrlContentAsBytesHandler(ident);
-    } else if (name.equals(UrlContentAsString.class.getSimpleName())) {
-      handler = new UrlContentAsStringHandler(ident);
-    } else if (name.equals(ClassType.class.getSimpleName())) {
-      handler = new ClassTypeMacroHandler(ident);
-    }
+  }
 
-    if (handler == null) {
-      return Optional.empty();
-    }
-
-    if (!handler.validate()) {
-      return Optional.empty();
-    }
-
-    return Optional.of(handler);
+  private static boolean classHandlerCanHandleFunction(
+      Class<? extends MacroHandler> clazz, String functionName) {
+    var className = clazz.getSimpleName();
+    var expectedName = className.substring(0, className.length() - "Handler".length());
+    var capitalizedFunctionName =
+        functionName.substring(0, 1).toUpperCase() + functionName.substring(1);
+    return expectedName.equals(capitalizedFunctionName);
   }
 }

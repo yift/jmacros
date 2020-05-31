@@ -3,15 +3,15 @@ package me.ykaplan.jmacros.processor;
 import com.sun.tools.javac.tree.JCTree;
 
 abstract class LiteralMacroHandler<T> extends MacroHandler {
-  LiteralMacroHandler(TreeElement<? extends JCTree> toReplace) {
+  LiteralMacroHandler(TreeElement<JCTree.JCMethodInvocation> toReplace) {
     super(toReplace);
   }
 
-  abstract T getLiteralReplacement(TreeElement<? extends JCTree> identifier);
+  abstract T getLiteralReplacement();
 
   @Override
-  JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier) {
-    var value = getLiteralReplacement(identifier);
-    return identifier.getBuilder().createLiteral(value);
+  JCTree.JCExpression getReplacement(TreeBuilder builder) {
+    T value = getLiteralReplacement();
+    return builder.createLiteral(value);
   }
 }

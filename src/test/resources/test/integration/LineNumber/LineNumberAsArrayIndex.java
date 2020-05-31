@@ -1,9 +1,9 @@
-import me.ykaplan.jmacros.macros.LineNumber;
+import static me.ykaplan.jmacros.LiteralMacro.lineNumber;
 
 public class LineNumberAsArrayIndex {
     public static String go() {
         char[] array =
                 {'1', 'a', 'b', 'c', 'd', 'e', 'f', '-', '5'};
-        return "Char is " + array[LineNumber];
+        return "Char is " + array[lineNumber()];
     }
 }

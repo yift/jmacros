@@ -18,6 +18,7 @@ class TreeElement<T extends JCTree> {
   private final TreeElement<?> parent;
   private final Trees trees;
   private final TreeBuilderFactory builder;
+  private final MacrosImportsHandler imports;
 
   static TreeElement<JCTree.JCCompilationUnit> getUnit(
       Element element, JavacProcessingEnvironment processingEnvironment) {
@@ -28,8 +29,10 @@ class TreeElement<T extends JCTree> {
       if (tree != null) {
         var compilationUnit = tree.getCompilationUnit();
         if (compilationUnit instanceof JCTree.JCCompilationUnit) {
+          var unit = (JCTree.JCCompilationUnit) compilationUnit;
+          var imports = new MacrosImportsHandler(unit);
           return new TreeElement<>(
-              (JCTree.JCCompilationUnit) compilationUnit, null, trees, builder);
+              (JCTree.JCCompilationUnit) compilationUnit, null, trees, builder, imports);
         }
       }
     } catch (Exception e) {
@@ -39,14 +42,20 @@ class TreeElement<T extends JCTree> {
   }
 
   private TreeElement(T element, TreeElement<?> parent) {
-    this(element, parent, parent.trees, parent.builder);
+    this(element, parent, parent.trees, parent.builder, parent.imports);
   }
 
-  private TreeElement(T element, TreeElement<?> parent, Trees trees, TreeBuilderFactory builder) {
+  private TreeElement(
+      T element,
+      TreeElement<?> parent,
+      Trees trees,
+      TreeBuilderFactory builder,
+      MacrosImportsHandler imports) {
     this.element = element;
     this.parent = parent;
     this.trees = trees;
     this.builder = builder;
+    this.imports = imports;
   }
 
   T getElement() {
@@ -63,6 +72,10 @@ class TreeElement<T extends JCTree> {
 
   void error(String text) {
     message(Diagnostic.Kind.ERROR, text);
+  }
+
+  MacrosImportsHandler getImports() {
+    return imports;
   }
 
   <R extends JCTree> void forEachOfType(Class<R> type, Consumer<TreeElement<R>> consumer) {

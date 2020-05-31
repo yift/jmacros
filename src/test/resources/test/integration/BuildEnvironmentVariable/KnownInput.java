@@ -1,11 +1,11 @@
-import me.ykaplan.jmacros.macros.*;
+import static me.ykaplan.jmacros.LiteralMacro.*;
 
 public class KnownInput {
 
 
     public static String go() {
 
-        return "variable is |" + (BuildEnvironmentVariable("PATH").length() > 0) + "|";
+        return "variable is |" + (buildEnvironmentVariable("PATH").length() > 0) + "|";
 
     }
 }

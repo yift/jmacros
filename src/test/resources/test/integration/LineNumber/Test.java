@@ -1,17 +1,17 @@
-import me.ykaplan.jmacros.macros.LineNumber;
+import static me.ykaplan.jmacros.LiteralMacro.lineNumber;
 
 public class Test {
 
 
     public static String go() {
 
-        return "LineNumber is " + LineNumber +
+        return "LineNumber is " + lineNumber() +
 
 
                 " and now " +
 
 
-                Math.max(0L, LineNumber);
+                Math.max(0L, lineNumber());
 
     }
 }

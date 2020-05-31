@@ -5,8 +5,8 @@ import com.sun.tools.javac.util.List;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
+import me.ykaplan.jmacros.LiteralMacro;
 import me.ykaplan.jmacros.Macro;
-import me.ykaplan.jmacros.macros.LiteralMacro;
 
 class MacroExtractor implements UnitProcessable {
   @Override

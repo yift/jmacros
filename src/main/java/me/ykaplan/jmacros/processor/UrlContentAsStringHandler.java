@@ -6,7 +6,7 @@ import java.net.URL;
 class UrlContentAsStringHandler extends InitMacroHandler {
   private String replacement = null;
 
-  protected UrlContentAsStringHandler(TreeElement<JCTree.JCIdent> identifier) {
+  protected UrlContentAsStringHandler(TreeElement<JCTree.JCMethodInvocation> identifier) {
     super(identifier);
   }
 
@@ -26,8 +26,8 @@ class UrlContentAsStringHandler extends InitMacroHandler {
   }
 
   @Override
-  JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier) {
-    return identifier.getBuilder().createLiteral(replacement);
+  JCTree.JCExpression getReplacement(TreeBuilder builder) {
+    return builder.createLiteral(replacement);
   }
 
   private String readUrl(String urlAsString) throws Exception {

@@ -1,4 +1,0 @@
-shouldCompile = false
-expectedErrors = [
-    {text = "One can only use FileContentAsBytes as a function name.", line = 8, column= 36}
-]

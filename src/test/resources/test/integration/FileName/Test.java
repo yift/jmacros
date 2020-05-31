@@ -1,12 +1,11 @@
-import me.ykaplan.jmacros.macros.FileName;
-import me.ykaplan.jmacros.macros.LineNumber;
+import static me.ykaplan.jmacros.LiteralMacro.fileName;
 
 public class Test {
 
 
     public static String go() {
 
-        return "File is Test.java? " + FileName.endsWith("Test.java");
+        return "File is Test.java? " + fileName().endsWith("Test.java");
 
     }
 }

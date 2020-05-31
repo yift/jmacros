@@ -1,4 +1,4 @@
-import me.ykaplan.jmacros.macros.LiteralMacro;
+import me.ykaplan.jmacros.LiteralMacro;
 
 public class ExceptionInMacro {
 

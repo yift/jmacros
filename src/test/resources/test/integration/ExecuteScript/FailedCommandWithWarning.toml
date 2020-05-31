@@ -1,7 +1,7 @@
 expectedWarnings = [
-    {text = "oops", line = 8, column= 32}
+    {text = "oops", line = 8, column= 45}
 ]
 expectedErrors = [
-    {text= "Can not execute 'src/test/resources/test/integration/ExecuteScript/test3.sh' Execution failed", line = 8, column= 32}
+    {text= "Can not execute 'src/test/resources/test/integration/ExecuteScript/test3.sh' Execution failed", line = 8, column= 45}
 ]
 shouldCompile = false

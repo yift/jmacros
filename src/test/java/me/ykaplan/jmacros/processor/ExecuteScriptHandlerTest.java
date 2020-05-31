@@ -13,7 +13,7 @@ public class ExecuteScriptHandlerTest {
     var process = mock(Process.class);
     doReturn(process).when(runtime).exec(command);
     @SuppressWarnings("unchecked")
-    var element = (TreeElement<JCTree.JCIdent>) mock(TreeElement.class);
+    var element = (TreeElement<JCTree.JCMethodInvocation>) mock(TreeElement.class);
     var handler = new ExecuteScriptHandler(element, runtime);
     doReturn(false).when(process).waitFor(anyLong(), any());
 

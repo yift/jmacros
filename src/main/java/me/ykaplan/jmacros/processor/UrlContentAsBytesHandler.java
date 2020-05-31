@@ -6,7 +6,7 @@ import java.net.URL;
 class UrlContentAsBytesHandler extends InitMacroHandler {
   private byte[] replacement = null;
 
-  protected UrlContentAsBytesHandler(TreeElement<JCTree.JCIdent> identifier) {
+  protected UrlContentAsBytesHandler(TreeElement<JCTree.JCMethodInvocation> identifier) {
     super(identifier);
   }
 
@@ -26,8 +26,8 @@ class UrlContentAsBytesHandler extends InitMacroHandler {
   }
 
   @Override
-  JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier) {
-    return identifier.getBuilder().createByteArray(replacement);
+  JCTree.JCExpression getReplacement(TreeBuilder builder) {
+    return builder.createByteArray(replacement);
   }
 
   private byte[] readUrl(String urlAsString) throws Exception {

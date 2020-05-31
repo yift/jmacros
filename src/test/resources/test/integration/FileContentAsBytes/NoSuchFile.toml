@@ -1,4 +1,4 @@
  shouldCompile = false
  expectedErrors = [
-    {text= "Can not read file content: no such file!", line=7, column= 32}
+    {text= "Can not read file content: no such file!", line=7, column= 50}
  ]

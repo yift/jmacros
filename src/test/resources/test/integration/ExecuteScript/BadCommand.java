@@ -1,11 +1,11 @@
-import me.ykaplan.jmacros.macros.*;
+import static me.ykaplan.jmacros.LiteralMacro.executeScript;
 
 public class BadCommand {
 
 
     public static String go() {
 
-        return "variable is " + ExecuteScript("noScuchCommand");
+        return "variable is " + executeScript("noScuchCommand");
 
     }
 }

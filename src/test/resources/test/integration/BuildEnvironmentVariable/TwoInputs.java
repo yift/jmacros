@@ -1,11 +1,11 @@
-import me.ykaplan.jmacros.macros.*;
+import static me.ykaplan.jmacros.LiteralMacro.*;
 
 public class TwoInputs {
 
 
     public static String go() {
 
-        return "variable is " + BuildEnvironmentVariable("a", "b");
+        return "variable is " + buildEnvironmentVariable("a", "b");
 
     }
 }

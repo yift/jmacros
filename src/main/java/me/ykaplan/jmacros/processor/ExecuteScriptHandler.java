@@ -7,12 +7,12 @@ class ExecuteScriptHandler extends InitMacroHandler {
   private String replacement = null;
   private final Runtime runtime;
 
-  ExecuteScriptHandler(TreeElement<JCTree.JCIdent> identifier, Runtime runtime) {
+  ExecuteScriptHandler(TreeElement<JCTree.JCMethodInvocation> identifier, Runtime runtime) {
     super(identifier);
     this.runtime = runtime;
   }
 
-  protected ExecuteScriptHandler(TreeElement<JCTree.JCIdent> identifier) {
+  protected ExecuteScriptHandler(TreeElement<JCTree.JCMethodInvocation> identifier) {
     this(identifier, Runtime.getRuntime());
   }
 
@@ -33,8 +33,8 @@ class ExecuteScriptHandler extends InitMacroHandler {
   }
 
   @Override
-  JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier) {
-    return identifier.getBuilder().createLiteral(replacement);
+  JCTree.JCExpression getReplacement(TreeBuilder builder) {
+    return builder.createLiteral(replacement);
   }
 
   private String execute(String command) throws Exception {

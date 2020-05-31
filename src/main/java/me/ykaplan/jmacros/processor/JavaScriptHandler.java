@@ -7,7 +7,7 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 class JavaScriptHandler extends InitMacroHandler {
   private Object replacement = null;
 
-  protected JavaScriptHandler(TreeElement<JCTree.JCIdent> identifier) {
+  protected JavaScriptHandler(TreeElement<JCTree.JCMethodInvocation> identifier) {
     super(identifier);
   }
 
@@ -29,8 +29,8 @@ class JavaScriptHandler extends InitMacroHandler {
   }
 
   @Override
-  JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier) {
-    return identifier.getBuilder().createLiteral(replacement);
+  JCTree.JCExpression getReplacement(TreeBuilder builder) {
+    return builder.createLiteral(replacement);
   }
 
   @SuppressWarnings("removal")

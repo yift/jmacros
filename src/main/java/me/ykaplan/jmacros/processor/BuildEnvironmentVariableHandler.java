@@ -5,7 +5,7 @@ import com.sun.tools.javac.tree.JCTree;
 class BuildEnvironmentVariableHandler extends InitMacroHandler {
   private String replacement = null;
 
-  protected BuildEnvironmentVariableHandler(TreeElement<JCTree.JCIdent> identifier) {
+  protected BuildEnvironmentVariableHandler(TreeElement<JCTree.JCMethodInvocation> identifier) {
     super(identifier);
   }
 
@@ -23,7 +23,7 @@ class BuildEnvironmentVariableHandler extends InitMacroHandler {
   }
 
   @Override
-  JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier) {
-    return identifier.getBuilder().createLiteral(replacement);
+  JCTree.JCExpression getReplacement(TreeBuilder builder) {
+    return builder.createLiteral(replacement);
   }
 }

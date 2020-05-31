@@ -1,25 +1,25 @@
-import me.ykaplan.jmacros.macros.*;
+import static me.ykaplan.jmacros.LiteralMacro.javaScript;
 
 public class SimpleScripts {
 
     private String retString() {
-        return JavaScript("'hello'")+ " world";
+        return javaScript("'hello'")+ " world";
     }
 
     private String retNumber() {
-        return "" + (JavaScript("1 + 5") + 1);
+        return "" + (javaScript("1 + 5") + 1);
     }
 
     private String retBooleam() {
-        return "" + JavaScript("1 === 1");
+        return "" + javaScript("1 === 1");
     }
 
     private String retNull() {
-        return "" + JavaScript("null");
+        return "" + javaScript("null");
     }
 
     private String retJson() {
-        return JavaScript("[1, 2, 3, {a: 10}, null]");
+        return javaScript("[1, 2, 3, {a: 10}, null]");
     }
 
     public static String go() {

@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 class FileContentAsStringHandler extends InitMacroHandler {
   private String replacement = null;
 
-  protected FileContentAsStringHandler(TreeElement<JCTree.JCIdent> identifier) {
+  protected FileContentAsStringHandler(TreeElement<JCTree.JCMethodInvocation> identifier) {
     super(identifier);
   }
 
@@ -28,8 +28,8 @@ class FileContentAsStringHandler extends InitMacroHandler {
   }
 
   @Override
-  JCTree.JCExpression getReplacement(TreeElement<? extends JCTree> identifier) {
-    return identifier.getBuilder().createLiteral(replacement);
+  JCTree.JCExpression getReplacement(TreeBuilder builder) {
+    return builder.createLiteral(replacement);
   }
 
   private String readFile(String filePath) throws IOException {
