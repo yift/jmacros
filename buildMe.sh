@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ ! -n `which javac` ]; then
+if ! javac -version > /dev/null; then
   >&2 echo 'Must have java development kit installed'
   exit 1
 fi
-if [ -n `which gradle` ]; then
+if gradle -v > /dev/null; then
   gradle=$(which gradle)
 else
   echo "No gradle installed, downloading..."
