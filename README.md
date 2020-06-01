@@ -2,18 +2,19 @@
 Macros for Java
 
 
-# TODO - Phase 1
+# Phase 1
 * Unit tests
-* Java 11
-* Java 14
-* Support for Eclipse
-* Support for Idea
 * Windows
 * OSX
 * CI
 * Docs
+* Remove wrapper, add gradle ivoker
 
-# Future Phase 2
+# Phase 2
+* Eclipse Plugin
+* Idea Plugin
+
+# Phase 3
 * Extends
 * Operators
 * DynamicClass
