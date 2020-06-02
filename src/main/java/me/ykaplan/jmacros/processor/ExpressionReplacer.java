@@ -85,6 +85,12 @@ class ExpressionReplacer {
         parens.expr = replacement;
         return;
       }
+    } else if (parent instanceof JCTree.JCExpressionStatement) {
+      var statement = (JCTree.JCExpressionStatement) parent;
+      if (statement.expr == toReplace.getElement()) {
+        statement.expr = replacement;
+        return;
+      }
     }
     toReplace.error(
         "Replacing this kind of element in not yet supported; please report an issue in https://github.com/yift/jmacros");

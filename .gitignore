@@ -34,3 +34,7 @@ bin/
 
 # Ignore Gradle build output directory
 build
+
+gradle/wrapper
+gradlew
+gradlew.bat

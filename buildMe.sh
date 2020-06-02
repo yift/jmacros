@@ -11,7 +11,9 @@ else
   gradle_version='6.4.1'
   echo 'Installing gradle...'
   zip=$(mktemp --suffix .zip)
+  trap "rm -rf $zip" EXIT
   gradle_dir=$(mktemp -d)
+  trap "rm -rf $gradle_dir" EXIT
   cd $gradle_dir/
   curl -o $zip -L -s "https://services.gradle.org/distributions/gradle-${gradle_version}-bin.zip"
   jar xvf $zip
@@ -21,8 +23,3 @@ else
 fi
 
 ${gradle}  --no-daemon build
-
-if [ -z "$gradle_dir" ]; then
-  rm -rf $gradle_dir
-  rm -rf $zip
-fi

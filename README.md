@@ -2,23 +2,6 @@
 Macros for Java
 
 
-# Phase 1
-* Unit tests
-* Windows
-* OSX
-* CI
-* Docs
-* Remove wrapper, add gradle ivoker
-
-# Phase 2
-* Eclipse Plugin
-* Idea Plugin
-
-# Phase 3
-* Extends
-* Operators
-* DynamicClass
-* Wrapper?
 
 
 # To test with different JDKs:
@@ -45,10 +28,4 @@ Macros for Java
     - com.sun.tools.javac.util
     - com.sun.tools.javac.processing
     - com.sun.tools.javac.code
-
-
-# To run from Eclipse:
-* Open eclipse project
-* Add jar to classpath
-* Add the jar to the Annotation Processing see [here](https://stackoverflow.com/questions/43404891/how-to-configure-java-annotation-processors-in-eclipse)
 

@@ -43,6 +43,15 @@ tasks.withType<JavaCompile>() {
     options.compilerArgs.add("--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED")
 }
 
+
+tasks.withType<Javadoc> () {
+    excludes.add("me/ykaplan/jmacros/processor/**")
+    var opts = options;
+    if(opts is StandardJavadocDocletOptions) {
+        opts.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
+    }
+}
+
 tasks.jar {
     dependsOn(":createMetaInfService")
 }
