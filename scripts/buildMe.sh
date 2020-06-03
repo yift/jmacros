@@ -22,4 +22,6 @@ else
   cd -
 fi
 
-${gradle}  --no-daemon build
+cd $(dirname "$0")/..
+
+${gradle} --no-daemon --console=plain build javadoc jacocoTestReport
