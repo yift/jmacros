@@ -283,7 +283,8 @@ public class LiteralMacro {
    *
    * Any other return object will cause a compilation error.
    *
-   * <p>This will be removed if and when Nashorn will be removed from the JVM.
+   * <p>This will be removed if and when Nashorn <a href="https://openjdk.java.net/jeps/372">will be
+   * removed</a> from the JVM.
    *
    * @param script The script to run.
    * @return The output of the script.

@@ -29,6 +29,7 @@ To open the project with IntelliJ:
     - com.sun.tools.javac.util
     - com.sun.tools.javac.processing
     - com.sun.tools.javac.code
+    - com.sun.tools.javac.api
 
 
 ## Eclipse:
@@ -49,6 +50,7 @@ To open the project with Eclipse:
     - com.sun.tools.javac.util
     - com.sun.tools.javac.processing
     - com.sun.tools.javac.code
+    - com.sun.tools.javac.api
 
 # To test with different JDKs:
 * JDK 11: ```git clean -xfd && docker run --rm -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk11 gradle build```

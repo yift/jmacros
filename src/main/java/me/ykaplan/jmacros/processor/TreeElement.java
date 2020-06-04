@@ -4,6 +4,7 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
+import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.List;
@@ -23,7 +24,7 @@ class TreeElement<T extends JCTree> {
   static TreeElement<JCTree.JCCompilationUnit> getUnit(
       Element element, JavacProcessingEnvironment processingEnvironment) {
     var builder = new TreeBuilderFactory(processingEnvironment);
-    var trees = Trees.instance(processingEnvironment);
+    var trees = JavacTrees.instance(processingEnvironment.getContext());
     try {
       var tree = trees.getPath(element);
       if (tree != null) {

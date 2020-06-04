@@ -1,5 +1,6 @@
 package me.ykaplan.jmacros.processor;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import com.sun.tools.javac.tree.JCTree;
@@ -32,6 +33,28 @@ public class ExpressionReplacerTest {
 
     ExpressionReplacer.replace(toReplace, replacement);
     verify(toReplace).error(anyString());
+  }
+
+  @Test
+  public void expressionStatement_knownParent() {
+    var parent = mock(JCTree.JCExpressionStatement.class);
+    var parentElement = mock(TreeElement.class);
+    var toReplace = mock(TreeElement.class);
+    var replacement = mock(JCTree.JCExpression.class);
+    var element = mock(JCTree.JCExpression.class);
+    parent.expr = element;
+    doReturn(parent).when(parentElement).getElement();
+    doReturn(parentElement).when(toReplace).getParent();
+    doReturn(element).when(toReplace).getElement();
+
+    ExpressionReplacer.replace(toReplace, replacement);
+
+    assertThat(parent.expr).isEqualTo(replacement);
+  }
+
+  @Test
+  public void expressionStatement() {
+    unknownParent(JCTree.JCExpressionStatement.class);
   }
 
   @Test
