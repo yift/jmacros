@@ -24,4 +24,10 @@ fi
 
 cd $(dirname "$0")/..
 
-${gradle} --no-daemon --console=plain build javadoc jacocoTestReport
+if [[ -z "$MAVEN_UPLOAD_USER" ]]; then
+  echo "Building..."
+  ${gradle} --no-daemon --console=plain build javadoc jacocoTestReport
+else
+  echo "Building and publishing to maven..."
+  ${gradle} --no-daemon --console=plain build javadoc jacocoTestReport publish
+fi

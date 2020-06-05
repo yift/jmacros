@@ -1,7 +1,7 @@
 # jmacros
 This project provides a list of "macros" for java.
 
-To use it, add the [jar](https://jmacros.ykaplan.me/libs/jmacros.jar) to  the compilation classpath. If the compilation won't fail, there should be no need to add it to the execution classpath.
+To use it, add the [jar](https://jmacros.ykaplan.me/libs/jmacros-0.1-SNAPSHOT.jar) to  the compilation classpath. If the compilation won't fail, there should be no need to add it to the execution classpath.
 
 Detailed javadoc can be found [here](https://jmacros.ykaplan.me/docs/javadoc/).
 

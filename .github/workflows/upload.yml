@@ -12,7 +12,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 13
-      - name: Build with Gradle
+      - name: Build with Gradle and Publish
+        shell: bash
+        env:
+          MAVEN_UPLOAD_PWD: ${{ secrets.MAVEN_UPLOAD_PWD }}
+          MAVEN_UPLOAD_USER: ${{ secrets.MAVEN_UPLOAD_USER }}
+          PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
+          PGP_SIGNING_PASSWORD: ${{ secrets.PGP_SIGNING_PASSWORD }}
         run: ./scripts/buildMe.sh
       - name: Upload Reports
         shell: bash

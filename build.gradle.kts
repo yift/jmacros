@@ -1,6 +1,8 @@
 plugins {
     `java-library`
     jacoco
+    `maven-publish`
+    signing
     id("com.diffplug.gradle.spotless") version "4.0.0";
 }
 
@@ -20,6 +22,8 @@ dependencies {
 val test by tasks.getting(Test::class) {
     useJUnitPlatform()
 }
+
+version = "0.1-SNAPSHOT"
 
 spotless {
     java {
@@ -90,4 +94,74 @@ tasks.jacocoTestCoverageVerification {
         }
 
     }
+}
+
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allJava)
+}
+
+tasks.register<Jar>("javadocJar") {
+    dependsOn(tasks.javadoc)
+    archiveClassifier.set("javadoc")
+    from(tasks.javadoc.get().destinationDir)
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "MavenCentral"
+            val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+            credentials {
+                username = System.getenv("MAVEN_UPLOAD_USER")
+                password = System.getenv("MAVEN_UPLOAD_PWD")
+            }
+        }
+    }
+    publications {
+        create<MavenPublication>("mavenJava") {
+            groupId = "me.ykaplan.jmacros"
+            artifactId = "jmacros"
+            from(components["java"])
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+
+            pom {
+                name.set("jMacros")
+                description.set("A library to allow meta-programming in Java.")
+                url.set("https://jmacros.ykaplan.me/")
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://github.com/yift/jmacros/blob/master/LICENSE")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("yift")
+                        name.set("Yiftach Kaplan")
+                        email.set("yift@ykaplan.me")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:https://github.com/yift/jmacros.git")
+                    developerConnection.set("scm:git:https://github.com/yift/jmacros.git")
+                    url.set("https://github.com/yift/jmacros")
+                }
+
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(System.getenv("PGP_SIGNING_KEY"), System.getenv("PGP_SIGNING_PASSWORD"))
+    sign(publishing.publications["mavenJava"])
+}
+tasks.publish {
+    dependsOn(tasks.build)
+    dependsOn(tasks.findByPath("sourcesJar"))
+    dependsOn(tasks.findByPath("javadocJar"))
 }
