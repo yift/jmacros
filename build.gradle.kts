@@ -23,7 +23,7 @@ val test by tasks.getting(Test::class) {
     useJUnitPlatform()
 }
 
-version = "0.1-SNAPSHOT"
+version = "0.1.1"
 
 spotless {
     java {
