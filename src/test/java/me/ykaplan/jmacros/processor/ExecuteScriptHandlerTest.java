@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 public class ExecuteScriptHandlerTest {
   @Test
   public void timeoutInExecute() throws Exception {
-    var command = "test";
+    String[] command = {"test"};
     var runtime = mock(Runtime.class);
     var process = mock(Process.class);
     doReturn(process).when(runtime).exec(command);

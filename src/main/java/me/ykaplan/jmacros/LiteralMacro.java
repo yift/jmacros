@@ -170,7 +170,8 @@ public class LiteralMacro {
    */
   public static String executeScript(String command) {
     try {
-      var process = Runtime.getRuntime().exec(command);
+      var commands = command.split("\\s+");
+      var process = Runtime.getRuntime().exec(commands);
       if (!process.waitFor(30, TimeUnit.SECONDS)) {
         throw new Exception("Timeout!");
       }

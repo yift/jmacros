@@ -38,7 +38,8 @@ class ExecuteScriptHandler extends InitMacroHandler {
   }
 
   private String execute(String command) throws Exception {
-    var process = runtime.exec(command);
+    var commands = command.split("\\s+");
+    var process = runtime.exec(commands);
     if (!process.waitFor(30, TimeUnit.SECONDS)) {
       throw new Exception("Timeout!");
     }
