@@ -17,6 +17,18 @@ import org.junit.jupiter.api.Test;
 
 public class IntegrationTests {
   private static final Toml toml = new Toml();
+  private static final boolean nashornSupported;
+
+  static {
+    boolean supported = false;
+    try {
+      Class.forName("jdk.nashorn.api.scripting.ScriptObjectMirror");
+      supported = true;
+    } catch (ClassNotFoundException e) {
+      supported = false;
+    }
+    nashornSupported = supported;
+  }
 
   @Test
   public void integrationTests() throws Exception {
@@ -47,7 +59,7 @@ public class IntegrationTests {
 
   private static class Execution {
     private final Path javaSourceFile;
-    private final Path tomlFile;
+    private final Toml config;
     private final String testName;
     private final JavaCompiler compiler;
     private final FileManager fileManager;
@@ -57,7 +69,7 @@ public class IntegrationTests {
     private final List<Message> errors = new ArrayList<>();
 
     private Execution(Path tomlFile) {
-      this.tomlFile = tomlFile;
+      config = toml.read(tomlFile.toFile());
       var dir = tomlFile.getParent();
       testName = tomlFile.getFileName().toString().replace(".toml", "");
       System.out.println("Testing " + dir.getFileName() + ":" + testName);
@@ -67,6 +79,12 @@ public class IntegrationTests {
     }
 
     private void go() throws Exception {
+      if (config.getBoolean("needNashorn", false)) {
+        if (!nashornSupported) {
+          System.out.println("Nashorn is not supported in this JVM");
+          return;
+        }
+      }
       compile();
       if (compiled) {
         execute();
@@ -75,7 +93,6 @@ public class IntegrationTests {
     }
 
     private void verify() {
-      var config = toml.read(tomlFile.toFile());
       var softly = new SoftAssertions();
       var shouldCompile = config.getBoolean("shouldCompile", true);
       softly.assertThat(shouldCompile).isEqualTo(compiled);

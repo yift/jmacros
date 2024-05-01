@@ -2,7 +2,6 @@ package me.ykaplan.jmacros.processor;
 
 import com.sun.tools.javac.tree.JCTree;
 import javax.script.*;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 class JavaScriptHandler extends InitMacroHandler {
   private Object replacement = null;
@@ -36,19 +35,28 @@ class JavaScriptHandler extends InitMacroHandler {
   @SuppressWarnings("removal")
   private static Object compileAndExecuteScript(String script) throws Exception {
     System.setProperty("nashorn.args", "--no-deprecation-warning");
-    var engine = new ScriptEngineManager().getEngineByMimeType("text/javascript");
-    CompiledScript compiled = ((Compilable) engine).compile(script);
-    var eval = compiled.eval();
-    if ((eval instanceof String)
-        || (eval instanceof Boolean)
-        || (eval instanceof Number)
-        || (eval == null)) {
-      return eval;
-    } else if (eval instanceof ScriptObjectMirror) {
-      var json = (ScriptObjectMirror) engine.eval("JSON");
-      return json.callMember("stringify", eval);
-    } else {
-      throw new Exception("Can not change " + eval + " to literal");
+    try {
+      var scriptClass = Class.forName("jdk.nashorn.api.scripting.ScriptObjectMirror");
+
+      var engine = new ScriptEngineManager().getEngineByMimeType("text/javascript");
+      CompiledScript compiled = ((Compilable) engine).compile(script);
+      var eval = compiled.eval();
+      if ((eval instanceof String)
+          || (eval instanceof Boolean)
+          || (eval instanceof Number)
+          || (eval == null)) {
+        return eval;
+      } else if (scriptClass.isInstance(eval)) {
+        var json = engine.eval("JSON");
+        var method = scriptClass.getMethod("callMember", String.class, Object[].class);
+        Object[] args = {eval};
+        return method.invoke(json, "stringify", args);
+      } else {
+        throw new Exception("Can not change " + eval + " to literal");
+      }
+    } catch (ClassNotFoundException e) {
+      throw new UnsupportedOperationException(
+          "Nashorn was removed from the JVM, this feature is no longer availabvle");
     }
   }
 }

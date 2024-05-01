@@ -1,3 +1,4 @@
+needNashorn = true
 output = """[1,2,3,{"a":10},null]
 null
 7

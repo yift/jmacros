@@ -8,7 +8,7 @@ if gradle -v > /dev/null; then
   gradle=$(which gradle)
 else
   echo "No gradle installed, downloading..."
-  gradle_version='6.4.1'
+  gradle_version='6.7'
   echo 'Installing gradle...'
   zip=$(mktemp --suffix .zip)
   trap "rm -rf $zip" EXIT

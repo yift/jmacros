@@ -6,6 +6,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.nio.file.Paths;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 public class LiteralMacroNoReplacement {
 
@@ -129,6 +131,7 @@ public class LiteralMacroNoReplacement {
   }
 
   @Test
+  @EnabledForJreRange(max = JRE.JAVA_14)
   public void javaScript_returnString() {
     var script = "'h' + 'i'";
 
@@ -138,6 +141,7 @@ public class LiteralMacroNoReplacement {
   }
 
   @Test
+  @EnabledForJreRange(max = JRE.JAVA_14)
   public void javaScript_returnBoolean() {
     var script = "'1' == 1";
 
@@ -147,6 +151,7 @@ public class LiteralMacroNoReplacement {
   }
 
   @Test
+  @EnabledForJreRange(max = JRE.JAVA_14)
   public void javaScript_returnNumber() {
     var script = "1 + 10 * 2";
 
@@ -156,6 +161,7 @@ public class LiteralMacroNoReplacement {
   }
 
   @Test
+  @EnabledForJreRange(max = JRE.JAVA_14)
   public void javaScript_returnNull() {
     var script = "var obj = {a:1, b:2, c:null}; obj.c";
 
@@ -165,6 +171,7 @@ public class LiteralMacroNoReplacement {
   }
 
   @Test
+  @EnabledForJreRange(max = JRE.JAVA_14)
   public void javaScript_returnJson() {
     var script = "var obj = {a:1, b:2, c:null, d: []}; obj.d";
 
@@ -174,6 +181,7 @@ public class LiteralMacroNoReplacement {
   }
 
   @Test
+  @EnabledForJreRange(max = JRE.JAVA_14)
   public void javaScript_returnUnknown() {
     var script = "Java.type('java.util.Map');";
     assertThatThrownBy(() -> LiteralMacro.javaScript(script))
@@ -181,6 +189,7 @@ public class LiteralMacroNoReplacement {
   }
 
   @Test
+  @EnabledForJreRange(max = JRE.JAVA_14)
   public void javaScript_invalidScript() {
     var script = "{[";
     assertThatThrownBy(() -> LiteralMacro.javaScript(script)).isInstanceOf(RuntimeException.class);

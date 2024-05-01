@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptEngineManager;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 /**
  * This class can be used to a literal in compile time.
@@ -283,8 +282,8 @@ public class LiteralMacro {
    *
    * Any other return object will cause a compilation error.
    *
-   * <p>This will be removed if and when Nashorn <a href="https://openjdk.java.net/jeps/372">will be
-   * removed</a> from the JVM.
+   * <p>Available only in JDK 11, 13 and 14, after that Nashorn <a
+   * href="https://openjdk.java.net/jeps/372">was removed</a> from the JVM.
    *
    * @param script The script to run.
    * @return The output of the script.
@@ -293,6 +292,7 @@ public class LiteralMacro {
   public static Object javaScript(String script) {
     try {
       System.setProperty("nashorn.args", "--no-deprecation-warning");
+      var scriptClass = Class.forName("jdk.nashorn.api.scripting.ScriptObjectMirror");
       var engine = new ScriptEngineManager().getEngineByMimeType("text/javascript");
       CompiledScript compiled = ((Compilable) engine).compile(script);
       var eval = compiled.eval();
@@ -301,12 +301,17 @@ public class LiteralMacro {
           || (eval instanceof Number)
           || (eval == null)) {
         return eval;
-      } else if (eval instanceof ScriptObjectMirror) {
-        var json = (ScriptObjectMirror) engine.eval("JSON");
-        return json.callMember("stringify", eval);
+      } else if (scriptClass.isInstance(eval)) {
+        var json = engine.eval("JSON");
+        var method = scriptClass.getMethod("callMember", String.class, Object[].class);
+        Object[] args = {eval};
+        return method.invoke(json, "stringify", args);
       } else {
         throw new Exception("Can not change " + eval + " to literal");
       }
+    } catch (ClassNotFoundException e) {
+      throw new UnsupportedOperationException(
+          "Nashorn was removed from the JVM, this feature is no longer availabvle");
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

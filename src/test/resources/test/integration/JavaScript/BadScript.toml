@@ -1,4 +1,5 @@
 shouldCompile = false
+needNashorn = true
 expectedErrors = [
     {text = """Can not compile or run JavaScript: <eval>:1:1 Expected } but found eof
   {

@@ -1,4 +1,5 @@
 shouldCompile = false
+needNashorn = true
 expectedErrors = [
     {text = "Can not compile or run JavaScript: Can not change {} to literal", line = 8, column= 40}
 ]
