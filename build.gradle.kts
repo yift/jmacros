@@ -47,6 +47,15 @@ tasks.withType<JavaCompile>() {
     options.compilerArgs.add("--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
 }
 
+tasks.withType<Test>().all {
+    jvmArgs(
+        "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED"
+    )
+}
 
 tasks.withType<Javadoc> () {
     excludes.add("me/ykaplan/jmacros/processor/**")
