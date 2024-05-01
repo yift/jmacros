@@ -262,7 +262,7 @@ public class TreeMoverTest {
     var errors = new ArrayList<>();
     doAnswer(
             i -> {
-              var error = i.getArgumentAt(0, String.class);
+              String error = i.getArgument(0);
               errors.add(error);
               return null;
             })
@@ -276,7 +276,7 @@ public class TreeMoverTest {
     literal.typetag = TypeTag.PACKAGE;
     doAnswer(
             i -> {
-              var visitor = i.getArgumentAt(0, Visitor.class);
+              Visitor visitor = i.getArgument(0);
               visitor.visitLiteral(literal);
               return null;
             })
@@ -297,7 +297,7 @@ public class TreeMoverTest {
     literal.typetag = type;
     doAnswer(
             i -> {
-              var visitor = i.getArgumentAt(0, Visitor.class);
+              Visitor visitor = i.getArgument(0);
               visitor.visitLiteral(literal);
               return null;
             })
@@ -317,7 +317,7 @@ public class TreeMoverTest {
       setName(tree, nameTwo);
       doAnswer(
               i -> {
-                var visitor = i.getArgumentAt(0, Visitor.class);
+                Visitor visitor = i.getArgument(0);
                 doVisit(visitor, tree);
                 return null;
               })

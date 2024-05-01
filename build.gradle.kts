@@ -3,27 +3,26 @@ plugins {
     jacoco
     `maven-publish`
     signing
-    id("com.diffplug.gradle.spotless") version "4.0.0";
+    id("com.diffplug.spotless") version "6.25.0";
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
-    testImplementation("com.moandjiezana.toml:toml4j:0.7.2")
-    testImplementation("org.assertj:assertj-core:3.16.1")
-    testImplementation("org.mockito:mockito-all:1.10.19")
-
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0-M1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.0-M1")
+    testImplementation("io.hotmoka:toml4j:0.7.3")
+    testImplementation("org.assertj:assertj-core:3.25.3")
+    testImplementation("org.mockito:mockito-core:5.11.0")
 }
 
 val test by tasks.getting(Test::class) {
     useJUnitPlatform()
 }
 
-version = "0.1.1"
+version = "0.1.2"
 
 spotless {
     java {
@@ -33,7 +32,7 @@ spotless {
 
 allprojects {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -70,12 +69,15 @@ tasks.register("createMetaInfService") {
                 .map{it.dropLast(5)}
                 .map{"me.ykaplan.jmacros.processor." + it}
                 .joinToString(separator = "\n")
-        val dir = "${buildDir}/classes/java/main/META-INF/services/";
+        val dir = "${layout.buildDirectory.get()}/classes/java/main/META-INF/services/";
         mkdir(dir)
         File("${dir}/javax.annotation.processing.Processor").writeText(processors);
     }
 }
 tasks.test {
+    this.testLogging {
+        this.showStandardStreams = true
+    }
     finalizedBy(tasks.jacocoTestReport)
 }
 tasks.jacocoTestReport {
