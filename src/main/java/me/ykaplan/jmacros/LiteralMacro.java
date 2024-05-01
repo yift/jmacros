@@ -1,7 +1,8 @@
 package me.ykaplan.jmacros;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -369,11 +370,13 @@ public class LiteralMacro {
    */
   public static byte[] urlContentAsBytes(String urlAsString) {
     try {
-      var url = new URL(urlAsString);
-      try (var reader = url.openStream(); ) {
+      var url = new URI(urlAsString);
+      try (var reader = url.toURL().openStream(); ) {
         return reader.readAllBytes();
       }
     } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
   }

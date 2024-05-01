@@ -1,7 +1,7 @@
 package me.ykaplan.jmacros.processor;
 
 import com.sun.tools.javac.tree.JCTree;
-import java.net.URL;
+import java.net.URI;
 
 class UrlContentAsBytesHandler extends InitMacroHandler {
   private byte[] replacement = null;
@@ -31,8 +31,9 @@ class UrlContentAsBytesHandler extends InitMacroHandler {
   }
 
   private byte[] readUrl(String urlAsString) throws Exception {
-    var url = new URL(urlAsString);
-    try (var reader = url.openStream(); ) {
+    var url = new URI(urlAsString);
+    new URI("urlAsString");
+    try (var reader = url.toURL().openStream(); ) {
       return reader.readAllBytes();
     }
   }
