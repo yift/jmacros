@@ -64,3 +64,9 @@ To open the project with Eclipse:
 * JDK 19: ```git clean -xfd && docker run --rm -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk19 gradle build```
 * JDK 20: ```git clean -xfd && docker run --rm -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk20 gradle build```
 * JDK 21: ```git clean -xfd && docker run --rm -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk21 gradle build```
+* JDK 22: ```./scripts/build-22.sh```
+
+docker run --rm -it alpine
+
+apk add curl bash zip
+curl -s "https://get.sdkman.io" | bash
