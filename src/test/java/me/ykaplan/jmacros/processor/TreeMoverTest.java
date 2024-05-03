@@ -334,7 +334,7 @@ public class TreeMoverTest {
     void test() {
       TreeMover.move(tree, element);
 
-      assertThat(getName(tree)).isEqualTo(nameOne);
+      assertThat(getName(tree) == nameOne).isTrue();
       assertThat(tree.pos).isEqualTo(pos);
     }
   }

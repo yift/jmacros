@@ -35,7 +35,7 @@ abstract class InternalCompiler {
 
   boolean compile() {
     var output = new StringWriter();
-    List<String> args = List.of();
+    List<String> args = List.of("-processor", "me.ykaplan.jmacros.processor.MacroProcessor");
     var units = List.of(new FileObject());
     var compiler = ToolProvider.getSystemJavaCompiler();
     var task =
